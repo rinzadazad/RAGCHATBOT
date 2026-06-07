@@ -1,6 +1,9 @@
 import os
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+
+logging.basicConfig(level=logging.INFO)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -19,9 +22,17 @@ limiter = Limiter(key_func=get_remote_address)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    ensure_extensions()           # Enable pgvector before creating tables
-    Base.metadata.create_all(bind=engine)
-    run_migrations()
+    logging.info("Starting up — DATABASE_URL prefix: %s", os.getenv("DATABASE_URL", "NOT SET")[:20])
+    try:
+        ensure_extensions()
+        logging.info("pgvector extension check done")
+        Base.metadata.create_all(bind=engine)
+        logging.info("Database tables created")
+        run_migrations()
+        logging.info("Migrations complete")
+    except Exception as exc:
+        logging.exception("Startup failed: %s", exc)
+        raise
     yield
 
 

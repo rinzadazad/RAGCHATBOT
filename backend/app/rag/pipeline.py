@@ -9,7 +9,7 @@ from app.rag.retriever import (
     add_chunks_to_vector_store, retrieve_similar_chunks,
     retrieve_similar_chunks_all_users, delete_document_chunks,
 )
-from app.utils.file_utils import extract_text_from_file, clean_text, get_upload_dir
+from app.utils.file_utils import extract_text_from_file, clean_text
 
 RAG_SIMILARITY_THRESHOLD = 0.5
 
@@ -45,8 +45,7 @@ def process_document(document_id: int, db: Session) -> None:
         chunk_size = settings.chunk_size if settings else 512
         chunk_overlap = settings.chunk_overlap if settings else 50
 
-        file_path = str(get_upload_dir() / document.filename)
-        raw_text = extract_text_from_file(file_path, document.file_type)
+        raw_text = extract_text_from_file(document.filename, document.file_type)
         clean = clean_text(raw_text)
 
         if not clean:
@@ -57,13 +56,14 @@ def process_document(document_id: int, db: Session) -> None:
             raise ValueError("Text chunking produced no chunks")
 
         embeddings = generate_embeddings(chunks)
-        delete_document_chunks(user_id, document_id)
+        delete_document_chunks(user_id, document_id, db)
         add_chunks_to_vector_store(
             user_id=user_id,
             document_id=document_id,
             document_name=document.original_filename,
             chunks=chunks,
             embeddings=embeddings,
+            db=db,
         )
 
         document.chunk_count = len(chunks)
@@ -80,6 +80,7 @@ def process_document(document_id: int, db: Session) -> None:
 def retrieve_context(
     query: str,
     user_id: int,
+    db,
     is_admin: bool = False,
     top_k: int = 5,
     similarity_threshold: float = RAG_SIMILARITY_THRESHOLD,
@@ -90,6 +91,7 @@ def retrieve_context(
     if is_admin:
         chunks = retrieve_similar_chunks_all_users(
             query_embedding=query_embedding,
+            db=db,
             top_k=top_k,
             similarity_threshold=similarity_threshold,
             document_ids=source_ids,
@@ -98,6 +100,7 @@ def retrieve_context(
         chunks = retrieve_similar_chunks(
             user_id=user_id,
             query_embedding=query_embedding,
+            db=db,
             top_k=top_k,
             similarity_threshold=similarity_threshold,
             document_ids=source_ids,

@@ -1,5 +1,4 @@
 import uuid
-from pathlib import Path
 from typing import List, Optional
 from fastapi import APIRouter, Depends, UploadFile, File, BackgroundTasks, HTTPException
 from sqlalchemy.orm import Session
@@ -16,7 +15,7 @@ from app.services.document_service import (
     reindex_document,
     _process_in_background,
 )
-from app.utils.file_utils import save_upload_file, get_upload_dir, clean_text
+from app.utils.file_utils import save_upload_file, save_text_as_file, clean_text
 from app.rag.retriever import get_collection_count, get_all_collections_count
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
@@ -83,7 +82,7 @@ def document_stats(
             indexed_documents=sum(1 for d in all_docs if d.status == DocumentStatus.INDEXED),
             failed_documents=sum(1 for d in all_docs if d.status == DocumentStatus.FAILED),
             storage_used_bytes=sum(d.file_size for d in all_docs),
-            vector_count=get_all_collections_count(),
+            vector_count=get_all_collections_count(db),
         )
 
     stats = get_document_stats(current_user.id, db)
@@ -93,7 +92,7 @@ def document_stats(
         indexed_documents=stats.indexed_documents,
         failed_documents=stats.failed_documents,
         storage_used_bytes=stats.storage_used_bytes,
-        vector_count=get_collection_count(current_user.id),
+        vector_count=get_collection_count(current_user.id, db),
     )
 
 
@@ -124,7 +123,7 @@ def delete_doc(
             raise HTTPException(status_code=404, detail="Document not found")
         from app.rag.retriever import delete_document_chunks
         from app.utils.file_utils import delete_file
-        delete_document_chunks(doc.user_id, doc.id)
+        delete_document_chunks(doc.user_id, doc.id, db)
         delete_file(doc.filename)
         db.delete(doc)
         db.commit()
@@ -160,10 +159,9 @@ def ingest_url(
     if not request.url.startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
 
-    # Save a placeholder .txt file; the background task will crawl and write to it
+    # Save a placeholder file in storage; the background task will replace it after crawling
     unique_filename = f"{uuid.uuid4().hex}_url.txt"
-    placeholder_path = get_upload_dir() / unique_filename
-    placeholder_path.write_text(f"Pending crawl: {request.url}", encoding="utf-8")
+    save_text_as_file(unique_filename, f"Pending crawl: {request.url}")
 
     document = Document(
         user_id=current_user.id,
@@ -197,8 +195,7 @@ def ingest_text(
         raise HTTPException(status_code=400, detail="Text content is empty after cleaning")
 
     unique_filename = f"{uuid.uuid4().hex}_text.txt"
-    file_path = get_upload_dir() / unique_filename
-    file_path.write_text(cleaned, encoding="utf-8")
+    save_text_as_file(unique_filename, cleaned)
 
     document = Document(
         user_id=current_user.id,
@@ -222,7 +219,7 @@ def _crawl_and_process(document_id: int, url: str, max_pages: int) -> None:
     from app.database.database import SessionLocal
     from app.rag.pipeline import process_document
     from app.services.url_crawler import crawl_website
-    from app.utils.file_utils import get_upload_dir, clean_text
+    from app.utils.file_utils import save_text_as_file, clean_text
 
     db = SessionLocal()
     try:
@@ -236,9 +233,7 @@ def _crawl_and_process(document_id: int, url: str, max_pages: int) -> None:
         raw_text = crawl_website(url, max_pages=max_pages)
         cleaned = clean_text(raw_text)
 
-        file_path = get_upload_dir() / doc.filename
-        file_path.write_text(cleaned, encoding="utf-8")
-        doc.file_size = len(cleaned.encode("utf-8"))
+        doc.file_size = save_text_as_file(doc.filename, cleaned)
         db.commit()
 
         process_document(document_id, db)

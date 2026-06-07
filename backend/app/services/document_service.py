@@ -6,8 +6,8 @@ from fastapi import BackgroundTasks
 from app.models.models import Document, DocumentStatus
 from app.schemas.schemas import DocumentStats
 from app.rag.pipeline import process_document
-from app.rag.retriever import delete_document_chunks, get_collection_count
-from app.utils.file_utils import delete_file, get_storage_used
+from app.rag.retriever import delete_document_chunks
+from app.utils.file_utils import delete_file
 
 
 def get_document_by_id(document_id: int, user_id: int, db: Session) -> Optional[Document]:
@@ -24,7 +24,7 @@ def get_document_stats(user_id: int, db: Session) -> DocumentStats:
     indexed_docs = sum(1 for d in docs if d.status == DocumentStatus.INDEXED)
     failed_docs = sum(1 for d in docs if d.status == DocumentStatus.FAILED)
     total_chunks = sum(d.chunk_count for d in docs)
-    storage_used = get_storage_used()
+    storage_used = sum(d.file_size for d in docs)
 
     return DocumentStats(
         total_documents=total_docs,
@@ -40,7 +40,7 @@ def delete_document(document_id: int, user_id: int, db: Session) -> bool:
     if not document:
         return False
 
-    delete_document_chunks(document.user_id, document_id)
+    delete_document_chunks(document.user_id, document_id, db)
     delete_file(document.filename)
     db.delete(document)
     db.commit()

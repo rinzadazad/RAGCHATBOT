@@ -100,7 +100,7 @@ def process_chat(
         )
 
     chunks, retrieval_time = retrieve_context(
-        query=user_message, user_id=user_id, is_admin=is_admin,
+        query=user_message, user_id=user_id, db=db, is_admin=is_admin,
         top_k=top_k, similarity_threshold=threshold, source_ids=source_ids,
     )
 

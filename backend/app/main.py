@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.database.database import engine, run_migrations
+from app.database.database import engine, ensure_extensions, run_migrations
 from app.models.models import Base
 from app.api import auth, documents, chat, search, settings as settings_router, admin
 
@@ -19,10 +19,9 @@ limiter = Limiter(key_func=get_remote_address)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    ensure_extensions()           # Enable pgvector before creating tables
     Base.metadata.create_all(bind=engine)
     run_migrations()
-    os.makedirs(os.getenv("UPLOAD_DIR", "./uploads"), exist_ok=True)
-    os.makedirs(os.getenv("CHROMA_DB_PATH", "./chroma_db"), exist_ok=True)
     yield
 
 

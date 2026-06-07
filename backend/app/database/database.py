@@ -22,6 +22,17 @@ def get_db():
         db.close()
 
 
+def ensure_extensions(eng=None):
+    """Enable required PostgreSQL extensions (must run before create_all)."""
+    target = eng or engine
+    try:
+        with target.connect() as conn:
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+            conn.commit()
+    except Exception:
+        pass  # Not PostgreSQL or already enabled
+
+
 def run_migrations(eng=None):
     """Add new columns to existing tables without Alembic."""
     target = eng or engine

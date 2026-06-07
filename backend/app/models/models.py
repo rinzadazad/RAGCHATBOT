@@ -1,8 +1,11 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Float, ForeignKey, Boolean, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from pgvector.sqlalchemy import Vector
 import enum
 from app.database.database import Base
+
+EMBEDDING_DIM = 384  # BAAI/bge-small-en-v1.5 output dimension
 
 
 class DocumentStatus(str, enum.Enum):
@@ -106,3 +109,16 @@ class Settings(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     user = relationship("User", back_populates="settings")
+
+
+class DocumentChunk(Base):
+    __tablename__ = "document_chunks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    chunk_index = Column(Integer, nullable=False)
+    text = Column(Text, nullable=False)
+    document_name = Column(String(500), nullable=False)
+    embedding = Column(Vector(EMBEDDING_DIM))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

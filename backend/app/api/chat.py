@@ -63,7 +63,7 @@ async def chat_stream(
     db.commit()
 
     chunks, _ = retrieve_context(
-        query=request.message, user_id=current_user.id,
+        query=request.message, user_id=current_user.id, db=db,
         is_admin=(current_user.role == UserRole.ADMIN),
         top_k=top_k, similarity_threshold=threshold,
         source_ids=request.source_ids,

@@ -1,0 +1,8 @@
+http://localhost:5173/login
+Admin Account
+
+Field	Value
+Email	admin@ragchatbot.com
+Password	Admin@2024!
+Role	admin
+URL	http://localhost:5173/login

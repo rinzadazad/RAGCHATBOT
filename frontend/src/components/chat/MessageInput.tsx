@@ -1,7 +1,9 @@
 import { useState, useRef, KeyboardEvent } from 'react'
-import { Send, Square, Loader2 } from 'lucide-react'
+import { Send, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
+const MAX_CHARS = 10_000
 
 interface Props {
   onSend: (message: string) => void
@@ -13,10 +15,12 @@ interface Props {
 export function MessageInput({ onSend, isStreaming, onStop, disabled }: Props) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const remaining = MAX_CHARS - value.length
+  const isOverLimit = remaining < 0
 
   const handleSend = () => {
     const msg = value.trim()
-    if (!msg || isStreaming || disabled) return
+    if (!msg || isStreaming || disabled || isOverLimit) return
     setValue('')
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
@@ -65,7 +69,7 @@ export function MessageInput({ onSend, isStreaming, onStop, disabled }: Props) {
               <Button
                 size="icon"
                 onClick={handleSend}
-                disabled={!value.trim() || disabled}
+                disabled={!value.trim() || disabled || isOverLimit}
                 className="h-8 w-8"
               >
                 <Send className="w-4 h-4" />
@@ -73,9 +77,14 @@ export function MessageInput({ onSend, isStreaming, onStop, disabled }: Props) {
             )}
           </div>
         </div>
-        <p className="text-xs text-muted-foreground text-center mt-2">
-          Press Enter to send · Shift+Enter for new line
-        </p>
+        <div className="flex items-center justify-between mt-2 px-1">
+          <p className="text-xs text-muted-foreground">Press Enter to send · Shift+Enter for new line</p>
+          {value.length > 8000 && (
+            <span className={cn('text-xs', isOverLimit ? 'text-destructive font-medium' : 'text-muted-foreground')}>
+              {isOverLimit ? `${Math.abs(remaining)} over limit` : `${remaining.toLocaleString()} chars left`}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )

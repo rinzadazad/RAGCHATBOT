@@ -12,21 +12,25 @@ export function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [touched, setTouched] = useState({ name: false, email: false, password: false })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { setAuth } = useAuthStore()
   const { toast } = useToast()
   const navigate = useNavigate()
 
+  const nameError = touched.name && name.trim().length < 2 ? 'Name must be at least 2 characters' : ''
+  const emailError = touched.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter a valid email address' : ''
+  const passwordError = touched.password && password.length < 6 ? 'Password must be at least 6 characters' : ''
+  const isFormValid = name.trim().length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && password.length >= 6
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password.length < 6) {
-      toast({ title: 'Password too short', description: 'Password must be at least 6 characters', variant: 'destructive' })
-      return
-    }
+    setTouched({ name: true, email: true, password: true })
+    if (!isFormValid) return
     setLoading(true)
     try {
-      const data = await authService.register(name, email, password)
+      const data = await authService.register(name.trim(), email.trim(), password)
       setAuth(data.user, data.access_token)
       navigate('/chat')
     } catch (err: any) {
@@ -48,15 +52,34 @@ export function RegisterPage() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <label className="text-sm font-medium" htmlFor="name">Full Name</label>
-            <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+            <Input
+              id="name"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+              className={nameError ? 'border-destructive focus-visible:ring-destructive' : ''}
+              required
+            />
+            {nameError && <p className="text-xs text-destructive">{nameError}</p>}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             <label className="text-sm font-medium" htmlFor="email">Email</label>
-            <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+              className={emailError ? 'border-destructive focus-visible:ring-destructive' : ''}
+              required
+            />
+            {emailError && <p className="text-xs text-destructive">{emailError}</p>}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             <label className="text-sm font-medium" htmlFor="password">Password</label>
             <div className="relative">
               <Input
@@ -65,13 +88,18 @@ export function RegisterPage() {
                 placeholder="Min. 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                className={`pr-10 ${passwordError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 required
-                className="pr-10"
               />
               <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {passwordError
+              ? <p className="text-xs text-destructive">{passwordError}</p>
+              : <p className="text-xs text-muted-foreground">At least 6 characters</p>
+            }
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

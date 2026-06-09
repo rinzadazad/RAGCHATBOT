@@ -36,9 +36,29 @@ export function DocumentsPage() {
   // URL ingestion state
   const [urlValue, setUrlValue] = useState('')
   const [urlKeyword, setUrlKeyword] = useState('')
+  const [urlError, setUrlError] = useState('')
   // Text ingestion state
   const [textKeyword, setTextKeyword] = useState('')
   const [textContent, setTextContent] = useState('')
+
+  const TEXT_MAX = 500_000
+  const KEYWORD_MAX = 255
+
+  const validateUrl = (v: string) => {
+    if (!v) return ''
+    try {
+      const u = new URL(v)
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return 'URL must start with http:// or https://'
+      return ''
+    } catch {
+      return 'Enter a valid URL (e.g. https://example.com)'
+    }
+  }
+
+  const handleUrlChange = (v: string) => {
+    setUrlValue(v)
+    setUrlError(validateUrl(v))
+  }
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['documents'] })
@@ -46,14 +66,23 @@ export function DocumentsPage() {
   }
 
   const urlMutation = useMutation({
-    mutationFn: () => documentService.ingestUrl(urlValue.trim(), urlKeyword.trim()),
+    mutationFn: () => {
+      const err = validateUrl(urlValue.trim())
+      if (err) { setUrlError(err); return Promise.reject(new Error(err)) }
+      return documentService.ingestUrl(urlValue.trim(), urlKeyword.trim())
+    },
     onSuccess: () => {
       toast({ title: 'Website queued for crawling', description: 'Indexing runs in the background.' })
       setUrlValue('')
       setUrlKeyword('')
+      setUrlError('')
       invalidate()
     },
-    onError: (err: any) => toast({ title: 'URL ingestion failed', description: err.response?.data?.detail ?? 'Error', variant: 'destructive' }),
+    onError: (err: any) => {
+      const msg = err.response?.data?.detail ?? err.message ?? 'Error'
+      if (!err.response) return // already shown via setUrlError
+      toast({ title: 'URL ingestion failed', description: msg, variant: 'destructive' })
+    },
   })
 
   const textMutation = useMutation({
@@ -194,11 +223,16 @@ export function DocumentsPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Display Name (keyword)</label>
+                <div className="flex justify-between mb-1">
+                  <label className="text-xs text-muted-foreground">Display Name</label>
+                  <span className={cn('text-xs', urlKeyword.length > KEYWORD_MAX ? 'text-destructive' : 'text-muted-foreground')}>
+                    {urlKeyword.length}/{KEYWORD_MAX}
+                  </span>
+                </div>
                 <Input
                   placeholder="e.g. Company Website"
                   value={urlKeyword}
-                  onChange={(e) => setUrlKeyword(e.target.value)}
+                  onChange={(e) => setUrlKeyword(e.target.value.slice(0, KEYWORD_MAX))}
                   className="h-8 text-sm"
                 />
               </div>
@@ -207,15 +241,15 @@ export function DocumentsPage() {
                 <Input
                   placeholder="https://example.com"
                   value={urlValue}
-                  onChange={(e) => setUrlValue(e.target.value)}
-                  className="h-8 text-sm"
-                  type="url"
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className={cn('h-8 text-sm', urlError ? 'border-destructive focus-visible:ring-destructive' : '')}
                 />
+                {urlError && <p className="text-xs text-destructive mt-1">{urlError}</p>}
               </div>
               <Button
                 size="sm"
                 className="w-full gap-2"
-                disabled={!urlValue.trim() || !urlKeyword.trim() || urlMutation.isPending}
+                disabled={!urlValue.trim() || !urlKeyword.trim() || !!urlError || urlMutation.isPending}
                 onClick={() => urlMutation.mutate()}
               >
                 {urlMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link className="w-3.5 h-3.5" />}
@@ -233,11 +267,16 @@ export function DocumentsPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Display Name (keyword)</label>
+                <div className="flex justify-between mb-1">
+                  <label className="text-xs text-muted-foreground">Display Name</label>
+                  <span className={cn('text-xs', textKeyword.length > KEYWORD_MAX ? 'text-destructive' : 'text-muted-foreground')}>
+                    {textKeyword.length}/{KEYWORD_MAX}
+                  </span>
+                </div>
                 <Input
                   placeholder="e.g. Course Syllabus"
                   value={textKeyword}
-                  onChange={(e) => setTextKeyword(e.target.value)}
+                  onChange={(e) => setTextKeyword(e.target.value.slice(0, KEYWORD_MAX))}
                   className="h-8 text-sm"
                 />
               </div>
@@ -246,14 +285,22 @@ export function DocumentsPage() {
                 <Textarea
                   placeholder="Paste your text here…"
                   value={textContent}
-                  onChange={(e) => setTextContent(e.target.value)}
-                  className="text-sm resize-none h-[68px]"
+                  onChange={(e) => setTextContent(e.target.value.slice(0, TEXT_MAX))}
+                  className={cn('text-sm resize-none h-[68px]', textContent.length > 0 && textContent.trim().length < 10 ? 'border-destructive' : '')}
                 />
+                <div className="flex justify-between mt-1">
+                  <span className="text-xs text-destructive">
+                    {textContent.length > 0 && textContent.trim().length < 10 ? 'Minimum 10 characters' : ''}
+                  </span>
+                  <span className={cn('text-xs', textContent.length > TEXT_MAX * 0.95 ? 'text-destructive' : 'text-muted-foreground')}>
+                    {textContent.length.toLocaleString()} / {TEXT_MAX.toLocaleString()}
+                  </span>
+                </div>
               </div>
               <Button
                 size="sm"
                 className="w-full gap-2"
-                disabled={!textContent.trim() || !textKeyword.trim() || textMutation.isPending}
+                disabled={!textContent.trim() || textContent.trim().length < 10 || !textKeyword.trim() || textContent.length > TEXT_MAX || textMutation.isPending}
                 onClick={() => textMutation.mutate()}
               >
                 {textMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Type className="w-3.5 h-3.5" />}

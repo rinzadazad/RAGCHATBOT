@@ -10,7 +10,7 @@ export function AuthLayout() {
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg">
             <Bot className="w-6 h-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">RAG Chatbot</h1>
+          <h1 className="text-2xl font-bold">RINZ Chatbot</h1>
         </div>
         <Outlet />
       </div>

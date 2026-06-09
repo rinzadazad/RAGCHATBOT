@@ -312,12 +312,12 @@ export function DocumentsPage() {
                       </th>
                       <th className="text-left p-3 text-xs font-medium text-muted-foreground">Name</th>
                       {isAdmin && (
-                        <th className="text-left p-3 text-xs font-medium text-muted-foreground">Owner</th>
+                        <th className="hidden sm:table-cell text-left p-3 text-xs font-medium text-muted-foreground">Owner</th>
                       )}
-                      <th className="text-left p-3 text-xs font-medium text-muted-foreground">Type</th>
-                      <th className="text-left p-3 text-xs font-medium text-muted-foreground">Chunks</th>
-                      <th className="text-left p-3 text-xs font-medium text-muted-foreground">Size</th>
-                      <th className="text-left p-3 text-xs font-medium text-muted-foreground">Uploaded</th>
+                      <th className="hidden sm:table-cell text-left p-3 text-xs font-medium text-muted-foreground">Type</th>
+                      <th className="hidden md:table-cell text-left p-3 text-xs font-medium text-muted-foreground">Chunks</th>
+                      <th className="hidden md:table-cell text-left p-3 text-xs font-medium text-muted-foreground">Size</th>
+                      <th className="hidden lg:table-cell text-left p-3 text-xs font-medium text-muted-foreground">Uploaded</th>
                       <th className="text-left p-3 text-xs font-medium text-muted-foreground">Status</th>
                       <th className="text-left p-3 text-xs font-medium text-muted-foreground">Actions</th>
                     </tr>
@@ -357,19 +357,19 @@ export function DocumentsPage() {
                             )}
                           </td>
                           {isAdmin && (
-                            <td className="p-3">
+                            <td className="hidden sm:table-cell p-3">
                               <div className="flex items-center gap-1.5">
                                 <User className="w-3.5 h-3.5 text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground truncate max-w-[160px]">{doc.owner_email ?? '—'}</span>
                               </div>
                             </td>
                           )}
-                          <td className="p-3">
+                          <td className="hidden sm:table-cell p-3">
                             <Badge variant="secondary" className="uppercase text-xs">{doc.file_type}</Badge>
                           </td>
-                          <td className="p-3 text-sm text-muted-foreground">{doc.chunk_count}</td>
-                          <td className="p-3 text-sm text-muted-foreground">{formatBytes(doc.file_size)}</td>
-                          <td className="p-3 text-sm text-muted-foreground whitespace-nowrap">{formatDate(doc.upload_date)}</td>
+                          <td className="hidden md:table-cell p-3 text-sm text-muted-foreground">{doc.chunk_count}</td>
+                          <td className="hidden md:table-cell p-3 text-sm text-muted-foreground">{formatBytes(doc.file_size)}</td>
+                          <td className="hidden lg:table-cell p-3 text-sm text-muted-foreground whitespace-nowrap">{formatDate(doc.upload_date)}</td>
                           <td className="p-3">
                             <div className="flex items-center gap-1.5">
                               <StatusIcon className={cn('w-3.5 h-3.5', doc.status === 'processing' && 'animate-spin', doc.status === 'indexed' && 'text-green-500', doc.status === 'failed' && 'text-destructive', doc.status === 'pending' && 'text-yellow-500', doc.status === 'processing' && 'text-blue-500')} />

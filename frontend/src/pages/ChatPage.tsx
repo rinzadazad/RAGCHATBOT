@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Bot, RefreshCw, Bug, Loader2, Globe, X, BookOpen, FileText, Type, ChevronDown } from 'lucide-react'
+import { Bot, RefreshCw, Bug, Loader2, Globe, X, BookOpen, FileText, Type, ChevronDown, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ChatSidebar } from '@/components/chat/ChatSidebar'
@@ -34,6 +34,7 @@ export function ChatPage() {
   const [selectedModel, setSelectedModel] = useState('llama-3.3-70b-versatile')
   const [loadingConversation, setLoadingConversation] = useState(false)
   const [pendingWebSearch, setPendingWebSearch] = useState<PendingWebSearch | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [selectedSourceIds, setSelectedSourceIds] = useState<Set<number>>(new Set())
   const [sourceSelectorOpen, setSourceSelectorOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -215,17 +216,26 @@ export function ChatPage() {
 
   return (
     <div className="flex h-full overflow-hidden">
-      <ChatSidebar onNewChat={handleNewChat} onSelectConversation={loadConversation} />
+      <ChatSidebar
+        onNewChat={handleNewChat}
+        onSelectConversation={loadConversation}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 h-14 border-b border-border bg-background/80 backdrop-blur-sm flex-shrink-0">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(true)} className="md:hidden h-8 w-8">
+              <Menu className="w-4 h-4" />
+            </Button>
             <ModelSelector value={selectedModel} onChange={setSelectedModel} />
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={toggleDebugPanel} className={showDebugPanel ? 'text-primary' : ''}>
-              <Bug className="w-4 h-4 mr-1" /> Debug
+              <Bug className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Debug</span>
             </Button>
           </div>
         </div>

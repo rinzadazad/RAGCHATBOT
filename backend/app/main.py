@@ -34,6 +34,43 @@ async def lifespan(app: FastAPI):
         logging.exception("Startup failed: %s", exc)
         raise
 
+    # Bootstrap admin user from env vars (ADMIN_EMAIL + ADMIN_PASSWORD)
+    try:
+        from app.database.database import SessionLocal
+        from app.models.models import User, UserRole, Settings
+        from app.auth.jwt_handler import hash_password
+
+        admin_email = os.getenv("ADMIN_EMAIL", "").strip()
+        admin_password = os.getenv("ADMIN_PASSWORD", "").strip()
+        admin_name = os.getenv("ADMIN_NAME", "Admin").strip()
+
+        if admin_email and admin_password:
+            with SessionLocal() as db:
+                user = db.query(User).filter(User.email == admin_email).first()
+                if user:
+                    user.role = UserRole.ADMIN
+                    user.is_active = True
+                    user.password_hash = hash_password(admin_password)
+                    if not db.query(Settings).filter(Settings.user_id == user.id).first():
+                        db.add(Settings(user_id=user.id))
+                    db.commit()
+                    logging.info("Admin user updated: %s", admin_email)
+                else:
+                    new_admin = User(
+                        name=admin_name,
+                        email=admin_email,
+                        password_hash=hash_password(admin_password),
+                        role=UserRole.ADMIN,
+                        is_active=True,
+                    )
+                    db.add(new_admin)
+                    db.flush()
+                    db.add(Settings(user_id=new_admin.id))
+                    db.commit()
+                    logging.info("Admin user created: %s", admin_email)
+    except Exception as exc:
+        logging.warning("Admin bootstrap failed: %s", exc)
+
     # Re-queue any documents stuck in pending/processing from a previous run
     try:
         import threading

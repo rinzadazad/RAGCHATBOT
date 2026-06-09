@@ -14,13 +14,14 @@ def add_chunks_to_vector_store(
     chunks: List[str],
     embeddings: List[List[float]],
     db: Session,
+    start_index: int = 0,
 ) -> None:
     from app.models.models import DocumentChunk
     for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
         db.add(DocumentChunk(
             document_id=document_id,
             user_id=user_id,
-            chunk_index=i,
+            chunk_index=start_index + i,
             text=chunk,
             document_name=document_name,
             embedding=embedding,

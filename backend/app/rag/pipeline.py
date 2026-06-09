@@ -1,3 +1,4 @@
+import gc
 import time
 from typing import List, Dict, Any, Tuple, Optional
 from sqlalchemy.orm import Session
@@ -12,6 +13,7 @@ from app.rag.retriever import (
 from app.utils.file_utils import extract_text_from_file, clean_text
 
 RAG_SIMILARITY_THRESHOLD = 0.5
+EMBED_BATCH_SIZE = 16  # embed+insert 16 chunks at a time to stay under 512 MB
 
 NO_CONTEXT_REPLY = (
     "I could not find sufficient information in your uploaded documents to answer this question. "
@@ -47,24 +49,35 @@ def process_document(document_id: int, db: Session) -> None:
 
         raw_text = extract_text_from_file(document.filename, document.file_type)
         clean = clean_text(raw_text)
+        del raw_text
+        gc.collect()
 
         if not clean:
             raise ValueError("No extractable text found in document")
 
         chunks = chunk_text(clean, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        del clean
+        gc.collect()
+
         if not chunks:
             raise ValueError("Text chunking produced no chunks")
 
-        embeddings = generate_embeddings(chunks)
         delete_document_chunks(user_id, document_id, db)
-        add_chunks_to_vector_store(
-            user_id=user_id,
-            document_id=document_id,
-            document_name=document.original_filename,
-            chunks=chunks,
-            embeddings=embeddings,
-            db=db,
-        )
+
+        for batch_start in range(0, len(chunks), EMBED_BATCH_SIZE):
+            batch = chunks[batch_start:batch_start + EMBED_BATCH_SIZE]
+            embeddings = generate_embeddings(batch)
+            add_chunks_to_vector_store(
+                user_id=user_id,
+                document_id=document_id,
+                document_name=document.original_filename,
+                chunks=batch,
+                embeddings=embeddings,
+                start_index=batch_start,
+                db=db,
+            )
+            del embeddings, batch
+            gc.collect()
 
         document.chunk_count = len(chunks)
         document.status = DocumentStatus.INDEXED

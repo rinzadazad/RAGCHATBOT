@@ -26,7 +26,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex flex-col w-16 lg:w-64 h-full border-r border-border bg-card transition-all duration-300">
+    <aside className="flex flex-col w-16 lg:w-64 h-full border-r border-border bg-card">
       {/* Logo */}
       <div className="flex items-center gap-3 p-4 h-16 border-b border-border">
         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary flex items-center justify-center">

@@ -136,6 +136,7 @@ def delete_doc(
 @router.post("/reindex", response_model=List[DocumentOut])
 def reindex_documents(
     request: ReindexRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -143,6 +144,7 @@ def reindex_documents(
     for doc_id in request.document_ids:
         doc = reindex_document(doc_id, current_user.id, db)
         if doc:
+            background_tasks.add_task(_process_in_background, doc.id)
             results.append(DocumentOut.model_validate(doc))
     return results
 

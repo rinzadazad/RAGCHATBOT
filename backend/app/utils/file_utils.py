@@ -40,6 +40,7 @@ def generate_unique_filename(original_filename: str) -> str:
 
 
 async def save_upload_file(file: UploadFile) -> tuple[str, str, int]:
+    import asyncio
     ext = validate_file(file)
     unique_filename = generate_unique_filename(file.filename)
 
@@ -50,9 +51,14 @@ async def save_upload_file(file: UploadFile) -> tuple[str, str, int]:
             detail=f"File too large. Max size: {MAX_FILE_SIZE_BYTES // (1024 * 1024)}MB",
         )
 
-    get_supabase_client().storage.from_(BUCKET_NAME).upload(
-        unique_filename, content, {"content-type": "application/octet-stream"}
-    )
+    client = get_supabase_client()
+    bucket = BUCKET_NAME
+    fn = unique_filename
+
+    def _upload():
+        client.storage.from_(bucket).upload(fn, content, {"content-type": "application/octet-stream"})
+
+    await asyncio.get_running_loop().run_in_executor(None, _upload)
     return unique_filename, ext, len(content)
 
 
@@ -134,5 +140,6 @@ def clean_text(text: str) -> str:
     import re
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r' {2,}', ' ', text)
-    text = re.sub(r'[^\x20-\x7E\n\t]', ' ', text)
+    # Strip only actual control characters; preserve printable Unicode (Arabic, etc.)
+    text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', text)
     return text.strip()

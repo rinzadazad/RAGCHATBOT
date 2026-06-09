@@ -112,6 +112,16 @@ export function DocumentsPage() {
     }
   }
 
+  const handleRetry = async (id: number) => {
+    try {
+      await documentService.reindex([id])
+      queryClient.invalidateQueries({ queryKey: ['documents'] })
+      toast({ title: 'Document queued for reprocessing' })
+    } catch {
+      toast({ title: 'Retry failed', variant: 'destructive' })
+    }
+  }
+
   const toggleSelect = (id: number) => {
     setSelected((prev) => {
       const next = new Set(prev)
@@ -378,6 +388,11 @@ export function DocumentsPage() {
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-1">
+                              {doc.status !== 'indexed' && (
+                                <Button size="icon" variant="ghost" className="h-7 w-7" title="Retry processing" onClick={() => handleRetry(doc.id)}>
+                                  <RefreshCw className="w-3.5 h-3.5 text-muted-foreground hover:text-primary" />
+                                </Button>
+                              )}
                               <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDelete(doc.id)}>
                                 <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                               </Button>

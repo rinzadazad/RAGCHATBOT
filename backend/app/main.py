@@ -33,6 +33,31 @@ async def lifespan(app: FastAPI):
     except Exception as exc:
         logging.exception("Startup failed: %s", exc)
         raise
+
+    # Re-queue any documents stuck in pending/processing from a previous run
+    try:
+        import threading
+        from app.database.database import SessionLocal
+        from app.models.models import Document, DocumentStatus
+        from app.services.document_service import _process_in_background
+
+        with SessionLocal() as db:
+            stuck = db.query(Document).filter(
+                Document.status.in_([DocumentStatus.PENDING, DocumentStatus.PROCESSING])
+            ).all()
+            stuck_ids = [d.id for d in stuck]
+            for doc in stuck:
+                doc.status = DocumentStatus.PENDING
+            db.commit()
+
+        for doc_id in stuck_ids:
+            threading.Thread(target=_process_in_background, args=(doc_id,), daemon=True).start()
+
+        if stuck_ids:
+            logging.info("Startup: re-queued %d stuck document(s): %s", len(stuck_ids), stuck_ids)
+    except Exception as exc:
+        logging.warning("Startup: could not re-queue stuck documents: %s", exc)
+
     yield
 
 

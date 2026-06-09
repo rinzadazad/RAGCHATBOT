@@ -69,8 +69,5 @@ def reindex_document(document_id: int, user_id: int, db: Session) -> Optional[Do
     document.error_message = None
     document.chunk_count = 0
     db.commit()
-
-    _process_in_background(document_id)
-
     db.refresh(document)
-    return document
+    return document  # caller schedules _process_in_background

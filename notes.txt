@@ -6,3 +6,7 @@ Email	admin@ragchatbot.com
 Password	Admin@2024!
 Role	admin
 URL	http://localhost:5173/login
+
+
+https://ragchatbot-livid.vercel.app/login
+azad.rinzad120@gmail.com/Rinzad@2024!

@@ -44,6 +44,19 @@ export function MessageBubble({ message }: Props) {
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
+                  a({ href, children, ...props }) {
+                    return (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline underline-offset-2 hover:opacity-80"
+                        {...props}
+                      >
+                        {children}
+                      </a>
+                    )
+                  },
                   code({ node, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '')
                     const isInline = !match

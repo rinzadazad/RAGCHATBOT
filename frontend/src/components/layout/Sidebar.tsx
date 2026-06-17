@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { MessageSquare, FileText, Settings, Search, LogOut, Bot, Moon, Sun } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
@@ -18,10 +19,12 @@ export function Sidebar() {
   const { theme, toggleTheme } = useThemeStore()
   const { resetChatStore } = useChatStore()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const handleLogout = () => {
     clearAuth()
     resetChatStore()
+    queryClient.clear()
     navigate('/login')
   }
 

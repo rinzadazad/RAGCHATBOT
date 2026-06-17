@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,12 +17,14 @@ export function LoginPage() {
   const { setAuth } = useAuthStore()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
       const data = await authService.login(email, password)
+      queryClient.clear()
       setAuth(data.user, data.access_token)
       navigate('/chat')
     } catch (err: any) {

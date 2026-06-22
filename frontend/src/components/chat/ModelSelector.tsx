@@ -19,9 +19,9 @@ export function ModelSelector({ value, onChange }: Props) {
 
   return (
     <div className="relative group">
-      <button className="flex items-center gap-1.5 text-xs bg-secondary hover:bg-accent rounded-md px-3 py-1.5 transition-colors border border-border">
-        <span className="font-medium">{current?.description ?? value}</span>
-        <ChevronDown className="w-3 h-3 text-muted-foreground" />
+      <button className="flex items-center gap-1.5 text-xs bg-secondary hover:bg-accent rounded-md px-3 py-1.5 transition-colors border border-border max-w-[160px] sm:max-w-none">
+        <span className="font-medium truncate">{current?.description ?? value}</span>
+        <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
       </button>
 
       <div className="absolute top-full left-0 mt-1 w-64 bg-card border border-border rounded-xl shadow-xl z-50 py-1 hidden group-hover:block">

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   FileText, Trash2, RefreshCw, Search,
   CheckCircle, AlertCircle, Clock, Loader2, Database,
-  HardDrive, Layers, Files, ShieldCheck, User, Globe, Type, Link,
+  HardDrive, Layers, Files, ShieldCheck, User, Globe, Type, Link, Plus, X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,6 +51,7 @@ export function DocumentsPage() {
   const [activeTab, setActiveTab]       = useState<IngestTab>('file')
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
   const [deleting, setDeleting]         = useState(false)
+  const [showAddPanel, setShowAddPanel] = useState(false)
   const { toast }       = useToast()
   const queryClient     = useQueryClient()
   const { user }        = useAuthStore()
@@ -84,6 +85,7 @@ export function DocumentsPage() {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['documents', userId] })
     queryClient.invalidateQueries({ queryKey: ['document-stats', userId] })
+    setShowAddPanel(false)   // auto-close Add Content panel on mobile after ingestion
   }
 
   const urlMutation = useMutation({
@@ -193,33 +195,53 @@ export function DocumentsPage() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* ── Top bar ───────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-6 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <h1 className="font-bold text-lg">Knowledge Base</h1>
+      <div className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <h1 className="font-bold text-lg whitespace-nowrap">Knowledge Base</h1>
           {isAdmin && (
-            <Badge variant="secondary" className="gap-1 text-xs">
+            <Badge variant="secondary" className="gap-1 text-xs hidden sm:flex">
               <ShieldCheck className="w-3 h-3" />
-              Admin View — All Users
+              Admin View
             </Badge>
           )}
         </div>
-        {/* Inline stat chips */}
-        <div className="hidden md:flex items-center gap-3">
-          {statCards.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="flex items-center gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1">
-              <Icon className={cn('w-3.5 h-3.5', color)} />
-              <span className="text-xs text-muted-foreground">{label}:</span>
-              <span className="text-xs font-bold">{value}</span>
-            </div>
-          ))}
+        <div className="flex items-center gap-2">
+          {/* Inline stat chips — desktop only */}
+          <div className="hidden lg:flex items-center gap-3">
+            {statCards.map(({ label, value, icon: Icon, color }) => (
+              <div key={label} className="flex items-center gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1">
+                <Icon className={cn('w-3.5 h-3.5', color)} />
+                <span className="text-xs text-muted-foreground">{label}:</span>
+                <span className="text-xs font-bold">{value}</span>
+              </div>
+            ))}
+          </div>
+          {/* Mobile: toggle Add Content panel */}
+          <button
+            onClick={() => setShowAddPanel((v) => !v)}
+            className={cn(
+              'md:hidden flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-colors font-medium',
+              showAddPanel
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-muted/50 text-foreground border-border hover:bg-muted',
+            )}
+          >
+            {showAddPanel ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+            {showAddPanel ? 'Close' : 'Add Content'}
+          </button>
         </div>
       </div>
 
       {/* ── Body: left panel + right panel ────────────────── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
 
-        {/* ── Left: Add Content panel (fixed width, no scroll needed) ── */}
-        <div className="w-72 flex-shrink-0 border-r border-border bg-card/50 flex flex-col overflow-hidden">
+        {/* ── Left: Add Content panel ── */}
+        {/* Mobile: full-width collapsible at top | Desktop: fixed-width sidebar */}
+        <div className={cn(
+          'border-border bg-card/50 flex-col overflow-hidden flex-shrink-0',
+          'md:flex md:w-72 md:border-r',
+          showAddPanel ? 'flex w-full border-b md:border-b-0' : 'hidden md:flex',
+        )}>
           <div className="px-4 pt-4 pb-2 flex-shrink-0">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Add Content</p>
             {/* Tabs */}
@@ -341,7 +363,7 @@ export function DocumentsPage() {
         {/* ── Right: Document list (fills remaining space, scrolls internally) ── */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Document list toolbar */}
-          <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-border bg-card/50 flex-shrink-0 flex-wrap">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 py-2.5 border-b border-border bg-card/50 flex-shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold">Documents</span>
               <Badge variant="secondary" className="text-xs">{filtered.length}</Badge>
@@ -351,14 +373,14 @@ export function DocumentsPage() {
                 </Button>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                 <Input
-                  placeholder="Search documents..."
+                  placeholder="Search..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-sm w-44"
+                  className="pl-8 h-8 text-sm w-32 sm:w-44"
                 />
               </div>
               <select
@@ -384,7 +406,7 @@ export function DocumentsPage() {
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-3">
                 <FileText className="w-12 h-12 opacity-20" />
-                <p className="text-sm">No documents yet — add one using the panel on the left</p>
+                <p className="text-sm text-center px-4">No documents yet — tap <strong>Add Content</strong> above to get started</p>
               </div>
             ) : (
               <table className="w-full">

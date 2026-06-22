@@ -242,14 +242,15 @@ export function SettingsPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-6 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
-        <div>
+      <div className="flex items-center justify-between px-4 sm:px-6 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 gap-3">
+        <div className="min-w-0">
           <h1 className="font-bold text-lg leading-tight">Settings</h1>
-          <p className="text-xs text-muted-foreground">Click <Info className="inline w-3 h-3 mx-0.5" /> on any setting to learn what it does</p>
+          <p className="text-xs text-muted-foreground hidden sm:block">Click <Info className="inline w-3 h-3 mx-0.5" /> on any setting to learn what it does</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} size="sm" className="gap-2 btn-uae text-white border-0">
+        <Button onClick={handleSave} disabled={saving} size="sm" className="gap-2 btn-uae text-white border-0 flex-shrink-0">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Save Changes
+          <span className="hidden sm:inline">Save Changes</span>
+          <span className="sm:hidden">Save</span>
         </Button>
       </div>
 

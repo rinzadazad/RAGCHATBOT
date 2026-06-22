@@ -1,0 +1,42 @@
+import { NavLink } from 'react-router-dom'
+import { MessageSquare, FileText, Search, Settings } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const navItems = [
+  { to: '/chat',      icon: MessageSquare, label: 'Chat'      },
+  { to: '/documents', icon: FileText,      label: 'Knowledge' },
+  { to: '/search',    icon: Search,        label: 'Search'    },
+  { to: '/settings',  icon: Settings,      label: 'Settings'  },
+]
+
+export function MobileBottomNav() {
+  return (
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-md border-t border-border safe-area-pb">
+      <div className="flex items-center justify-around h-16 px-1">
+        {navItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              cn(
+                'flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all min-w-0 flex-1',
+                isActive ? 'text-primary' : 'text-muted-foreground',
+              )
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <div className={cn('p-1.5 rounded-xl transition-colors', isActive && 'bg-primary/10')}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <span className={cn('text-[10px] font-medium leading-none', isActive && 'text-primary')}>
+                  {label}
+                </span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </div>
+    </nav>
+  )
+}

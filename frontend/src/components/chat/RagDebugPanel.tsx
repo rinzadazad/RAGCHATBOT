@@ -9,10 +9,10 @@ export function RagDebugPanel() {
   if (!showDebugPanel) return null
 
   return (
-    <div className="w-80 h-full border-l border-border bg-card/50 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 md:static md:inset-auto md:w-80 md:h-full border-l border-border bg-card flex flex-col overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h3 className="font-semibold text-sm">RAG Debug Panel</h3>
-        <button onClick={toggleDebugPanel} className="text-muted-foreground hover:text-foreground">
+        <button onClick={toggleDebugPanel} className="text-muted-foreground hover:text-foreground p-1">
           <X className="w-4 h-4" />
         </button>
       </div>

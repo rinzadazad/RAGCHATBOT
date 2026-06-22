@@ -31,7 +31,7 @@ export function Sidebar() {
   const initials = user?.name?.[0]?.toUpperCase() ?? 'U'
 
   return (
-    <aside className="flex flex-col w-16 lg:w-64 h-full border-r border-border bg-card">
+    <aside className="hidden md:flex flex-col w-16 lg:w-64 h-full border-r border-border bg-card">
       {/* ── UAE Brand Header ─────────────────────── */}
       <div className="sidebar-brand flex items-center gap-3 px-4 h-16 flex-shrink-0">
         <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center shadow-sm">

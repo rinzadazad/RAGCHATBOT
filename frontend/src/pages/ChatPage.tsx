@@ -234,19 +234,19 @@ export function ChatPage() {
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* ── Toolbar ─────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(true)} className="md:hidden h-8 w-8">
+        <div className="flex items-center justify-between px-3 sm:px-4 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(true)} className="md:hidden h-8 w-8 flex-shrink-0">
               <Menu className="w-4 h-4" />
             </Button>
             <ModelSelector value={selectedModel} onChange={setSelectedModel} />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleDebugPanel}
-              className={cn('gap-1', showDebugPanel ? 'text-primary font-semibold' : 'text-muted-foreground')}
+              className={cn('gap-1 px-2 sm:px-3', showDebugPanel ? 'text-primary font-semibold' : 'text-muted-foreground')}
             >
               <Bug className="w-4 h-4" />
               <span className="hidden sm:inline">Debug</span>
@@ -399,7 +399,7 @@ export function ChatPage() {
               </button>
 
               {sourceSelectorOpen && (
-                <div className="absolute bottom-full mb-1 left-0 w-80 bg-popover border border-border rounded-xl shadow-lg z-50 p-3">
+                <div className="absolute bottom-full mb-1 left-0 w-[min(320px,calc(100vw-2rem))] bg-popover border border-border rounded-xl shadow-lg z-50 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-medium text-muted-foreground">Select knowledge sources</p>
                     {selectedSourceIds.size > 0 && (

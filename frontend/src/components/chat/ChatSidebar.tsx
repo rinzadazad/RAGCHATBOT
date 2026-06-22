@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, Trash2, Edit2, MessageSquare, Check, X, Eraser } from 'lucide-react'
+import { Plus, Search, Trash2, Edit2, MessageSquare, Check, X, Eraser, AlertTriangle } from 'lucide-react'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -105,17 +105,50 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
         )}
       >
         {/* Header */}
-        <div className="p-3 border-b border-border flex items-center gap-2">
-          <Button onClick={handleNewChat} className="flex-1 gap-2" size="sm">
-            <Plus className="w-4 h-4" /> New Chat
-          </Button>
-          {isOpen && (
-            <button
-              onClick={onClose}
-              className="md:hidden p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-4 h-4" />
-            </button>
+        <div className="p-3 border-b border-border space-y-2">
+          <div className="flex items-center gap-2">
+            <Button onClick={handleNewChat} className="flex-1 gap-2" size="sm">
+              <Plus className="w-4 h-4" /> New Chat
+            </Button>
+            {isOpen && (
+              <button
+                onClick={onClose}
+                className="md:hidden p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Clear All row — always visible in header */}
+          {conversations.length > 0 && (
+            clearConfirm ? (
+              <div className="flex items-center gap-2 animate-fade-in bg-destructive/8 border border-destructive/20 rounded-lg px-2.5 py-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
+                <p className="flex-1 text-xs text-destructive font-medium">Delete all {conversations.length} chats?</p>
+                <button
+                  onClick={handleClearAll}
+                  disabled={clearing}
+                  className="text-xs font-bold text-destructive hover:text-destructive/80 px-2 py-0.5 rounded border border-destructive/40 hover:bg-destructive/15 transition-colors disabled:opacity-50"
+                >
+                  {clearing ? '…' : 'Yes'}
+                </button>
+                <button
+                  onClick={() => setClearConfirm(false)}
+                  className="text-xs text-muted-foreground hover:text-foreground px-2 py-0.5 rounded border border-border hover:bg-accent transition-colors"
+                >
+                  No
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleClearAll}
+                className="flex items-center gap-2 w-full text-xs text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-lg border border-border hover:border-destructive/30 hover:bg-destructive/8 group"
+              >
+                <Eraser className="w-3.5 h-3.5 group-hover:text-destructive" />
+                Clear all chats
+              </button>
+            )
           )}
         </div>
 
@@ -190,37 +223,6 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
           ))}
         </div>
 
-        {/* Clear All footer — only shown when there are conversations */}
-        {conversations.length > 0 && (
-          <div className="p-3 border-t border-border">
-            {clearConfirm ? (
-              <div className="flex items-center gap-2 animate-fade-in">
-                <p className="flex-1 text-xs text-destructive font-medium">Delete all {conversations.length} chats?</p>
-                <button
-                  onClick={handleClearAll}
-                  disabled={clearing}
-                  className="text-xs font-semibold text-destructive hover:text-destructive/80 px-2 py-1 rounded border border-destructive/30 hover:bg-destructive/10 transition-colors disabled:opacity-50"
-                >
-                  {clearing ? '…' : 'Yes'}
-                </button>
-                <button
-                  onClick={() => setClearConfirm(false)}
-                  className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border hover:bg-accent transition-colors"
-                >
-                  No
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleClearAll}
-                className="flex items-center gap-2 w-full text-xs text-muted-foreground hover:text-destructive transition-colors px-2 py-1.5 rounded-lg hover:bg-destructive/8 group"
-              >
-                <Eraser className="w-3.5 h-3.5 group-hover:text-destructive" />
-                Clear all chats
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </>
   )

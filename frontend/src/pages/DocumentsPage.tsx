@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DocumentUpload } from '@/components/documents/DocumentUpload'
 import { documentService } from '@/services/documentService'
 import { useAuthStore } from '@/store/authStore'
@@ -48,6 +49,8 @@ export function DocumentsPage() {
   const [statusFilter, setStatusFilter] = useState<DocumentStatus | 'all'>('all')
   const [selected, setSelected]         = useState<Set<number>>(new Set())
   const [activeTab, setActiveTab]       = useState<IngestTab>('file')
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
+  const [deleting, setDeleting]         = useState(false)
   const { toast }       = useToast()
   const queryClient     = useQueryClient()
   const { user }        = useAuthStore()
@@ -134,13 +137,20 @@ export function DocumentsPage() {
     return matchesSearch && matchesStatus
   })
 
-  const handleDelete = async (id: number) => {
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await documentService.delete(id)
+      await documentService.delete(deleteTarget.id)
       queryClient.invalidateQueries({ queryKey: ['documents', userId] })
       queryClient.invalidateQueries({ queryKey: ['document-stats', userId] })
       toast({ title: 'Document deleted' })
-    } catch { toast({ title: 'Delete failed', variant: 'destructive' }) }
+    } catch {
+      toast({ title: 'Delete failed', variant: 'destructive' })
+    } finally {
+      setDeleting(false)
+      setDeleteTarget(null)
+    }
   }
 
   const handleReindex = async () => {
@@ -465,7 +475,12 @@ export function DocumentsPage() {
                                 <RefreshCw className="w-3.5 h-3.5 text-muted-foreground hover:text-primary" />
                               </Button>
                             )}
-                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDelete(doc.id)}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
+                              onClick={() => setDeleteTarget({ id: doc.id, name: doc.original_filename })}
+                            >
                               <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                             </Button>
                           </div>
@@ -480,5 +495,15 @@ export function DocumentsPage() {
         </div>
       </div>
     </div>
+
+    <ConfirmDialog
+      open={!!deleteTarget}
+      title="Delete Document"
+      description={`"${deleteTarget?.name ?? ''}" and all its indexed chunks will be permanently deleted. This cannot be undone.`}
+      confirmLabel="Delete Document"
+      loading={deleting}
+      onConfirm={confirmDelete}
+      onCancel={() => setDeleteTarget(null)}
+    />
   )
 }

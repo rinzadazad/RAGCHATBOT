@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Plus, Search, Trash2, Edit2, MessageSquare, Check, X, Eraser, AlertTriangle } from 'lucide-react'
+import { Plus, Search, Trash2, Edit2, MessageSquare, Check, X, Eraser } from 'lucide-react'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useChatStore } from '@/store/chatStore'
 import { chatService } from '@/services/chatService'
 import { useToast } from '@/hooks/use-toast'
@@ -20,33 +21,37 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
   const [searchQuery, setSearchQuery] = useState('')
   const [renamingId, setRenamingId] = useState<number | null>(null)
   const [renameValue, setRenameValue] = useState('')
-  const [clearConfirm, setClearConfirm] = useState(false)
-  const [clearing, setClearing] = useState(false)
+
+  // Confirmation dialog state
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null)
+  const [showClearAll, setShowClearAll] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
+
   const { toast } = useToast()
 
   const filtered = conversations.filter((c) =>
     c.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleDelete = async (e: React.MouseEvent, id: number) => {
-    e.stopPropagation()
+  /* ── Single delete ─────────────────────────────────────── */
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    setActionLoading(true)
     try {
-      await chatService.deleteConversation(id)
-      removeConversation(id)
-      toast({ title: 'Conversation deleted', variant: 'default' })
+      await chatService.deleteConversation(deleteTarget.id)
+      removeConversation(deleteTarget.id)
+      toast({ title: 'Conversation deleted' })
     } catch {
       toast({ title: 'Failed to delete', variant: 'destructive' })
+    } finally {
+      setActionLoading(false)
+      setDeleteTarget(null)
     }
   }
 
-  const handleClearAll = async () => {
-    if (!clearConfirm) {
-      setClearConfirm(true)
-      // auto-cancel after 4 s if user doesn't confirm
-      setTimeout(() => setClearConfirm(false), 4000)
-      return
-    }
-    setClearing(true)
+  /* ── Clear all ─────────────────────────────────────────── */
+  const confirmClearAll = async () => {
+    setActionLoading(true)
     try {
       await chatService.deleteAllConversations(conversations.map((c) => c.id))
       clearConversations()
@@ -54,11 +59,12 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
     } catch {
       toast({ title: 'Failed to clear chats', variant: 'destructive' })
     } finally {
-      setClearing(false)
-      setClearConfirm(false)
+      setActionLoading(false)
+      setShowClearAll(false)
     }
   }
 
+  /* ── Rename ────────────────────────────────────────────── */
   const handleRenameStart = (e: React.MouseEvent, conv: Conversation) => {
     e.stopPropagation()
     setRenamingId(conv.id)
@@ -90,10 +96,7 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
     <>
       {/* Mobile backdrop */}
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} />
       )}
 
       <div
@@ -101,7 +104,7 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
           'flex flex-col h-full border-r border-border',
           isOpen
             ? 'fixed inset-y-0 left-16 w-72 z-50 shadow-2xl bg-card'
-            : 'hidden md:flex w-64 bg-card/50'
+            : 'hidden md:flex w-64 bg-card/50',
         )}
       >
         {/* Header */}
@@ -120,35 +123,15 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
             )}
           </div>
 
-          {/* Clear All row — always visible in header */}
+          {/* Clear All — always visible when chats exist */}
           {conversations.length > 0 && (
-            clearConfirm ? (
-              <div className="flex items-center gap-2 animate-fade-in bg-destructive/8 border border-destructive/20 rounded-lg px-2.5 py-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
-                <p className="flex-1 text-xs text-destructive font-medium">Delete all {conversations.length} chats?</p>
-                <button
-                  onClick={handleClearAll}
-                  disabled={clearing}
-                  className="text-xs font-bold text-destructive hover:text-destructive/80 px-2 py-0.5 rounded border border-destructive/40 hover:bg-destructive/15 transition-colors disabled:opacity-50"
-                >
-                  {clearing ? '…' : 'Yes'}
-                </button>
-                <button
-                  onClick={() => setClearConfirm(false)}
-                  className="text-xs text-muted-foreground hover:text-foreground px-2 py-0.5 rounded border border-border hover:bg-accent transition-colors"
-                >
-                  No
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleClearAll}
-                className="flex items-center gap-2 w-full text-xs text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-lg border border-border hover:border-destructive/30 hover:bg-destructive/8 group"
-              >
-                <Eraser className="w-3.5 h-3.5 group-hover:text-destructive" />
-                Clear all chats
-              </button>
-            )
+            <button
+              onClick={() => setShowClearAll(true)}
+              className="flex items-center gap-2 w-full text-xs text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-lg border border-border hover:border-destructive/30 hover:bg-destructive/8 group"
+            >
+              <Eraser className="w-3.5 h-3.5 group-hover:text-destructive" />
+              Clear all chats
+            </button>
           )}
         </div>
 
@@ -180,7 +163,7 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
                 'group relative flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all text-sm',
                 activeConversationId === conv.id
                   ? 'bg-primary/10 text-foreground'
-                  : 'hover:bg-accent text-muted-foreground hover:text-foreground'
+                  : 'hover:bg-accent text-muted-foreground hover:text-foreground',
               )}
             >
               <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
@@ -210,10 +193,19 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
                     <p className="text-xs text-muted-foreground">{formatRelativeTime(conv.updated_at)}</p>
                   </div>
                   <div className="hidden group-hover:flex items-center gap-1">
-                    <button onClick={(e) => handleRenameStart(e, conv)} className="p-0.5 hover:text-foreground">
+                    <button
+                      onClick={(e) => handleRenameStart(e, conv)}
+                      className="p-0.5 hover:text-foreground"
+                    >
                       <Edit2 className="w-3 h-3" />
                     </button>
-                    <button onClick={(e) => handleDelete(e, conv.id)} className="p-0.5 hover:text-destructive">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setDeleteTarget({ id: conv.id, title: conv.title })
+                      }}
+                      className="p-0.5 hover:text-destructive"
+                    >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
@@ -222,8 +214,29 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
             </div>
           ))}
         </div>
-
       </div>
+
+      {/* Delete single conversation */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Conversation"
+        description={`"${deleteTarget?.title ?? ''}" will be permanently deleted and cannot be recovered.`}
+        confirmLabel="Delete"
+        loading={actionLoading}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
+      {/* Clear all conversations */}
+      <ConfirmDialog
+        open={showClearAll}
+        title="Clear All Chats"
+        description={`All ${conversations.length} conversation${conversations.length === 1 ? '' : 's'} will be permanently deleted. This cannot be undone.`}
+        confirmLabel="Clear All"
+        loading={actionLoading}
+        onConfirm={confirmClearAll}
+        onCancel={() => setShowClearAll(false)}
+      />
     </>
   )
 }

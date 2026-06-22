@@ -14,8 +14,13 @@ def search_web(query: str, max_results: int = 5) -> List[Dict[str, Any]]:
 
 
 def _build_web_prompt(query: str, results: List[Dict[str, Any]]) -> str:
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%A, %d %B %Y, %H:%M UTC")
+
     if not results:
         return (
+            f"TODAY'S DATE: {today_str}\n\n"
             "No web search results were found.\n\n"
             f"QUESTION: {query}\n\n"
             "Please inform the user that no external results were found."
@@ -33,7 +38,8 @@ def _build_web_prompt(query: str, results: List[Dict[str, Any]]) -> str:
     return (
         "You are answering a question using live web search results. "
         "Use ONLY the information in these results to answer. "
-        "You MUST state clearly that this answer is based on external internet sources, not the user's documents.\n\n"
+        "You MUST state clearly that this answer is based on external internet sources, not the user's documents.\n"
+        f"TODAY'S DATE: {today_str}\n\n"
         f"WEB SEARCH RESULTS:\n{context}\n\n"
         f"QUESTION: {query}\n\n"
         "ANSWER (start your response with: '🌐 Based on external web sources:'):"

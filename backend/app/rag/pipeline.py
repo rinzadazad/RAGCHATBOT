@@ -123,6 +123,11 @@ def retrieve_context(
 
 
 def build_rag_prompt(query: str, chunks: List[Dict[str, Any]]) -> str:
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%A, %d %B %Y")        # e.g. "Monday, 22 June 2026"
+    time_str  = now.strftime("%H:%M UTC")            # e.g. "09:14 UTC"
+
     context_parts = []
     for i, chunk in enumerate(chunks, 1):
         context_parts.append(
@@ -132,14 +137,20 @@ def build_rag_prompt(query: str, chunks: List[Dict[str, Any]]) -> str:
     context = "\n\n---\n\n".join(context_parts)
 
     return (
-        "You are a knowledge base assistant. Your ONLY job is to answer questions using "
-        "the context passages provided below. Follow these rules strictly:\n"
-        "1. Answer ONLY from the provided context. Do NOT use any outside knowledge.\n"
-        "2. If the context does not contain a clear answer, say exactly: "
+        "You are a knowledge base assistant. Answer questions using the context passages below.\n"
+        f"TODAY'S DATE AND TIME: {today_str}, {time_str}\n\n"
+        "Rules:\n"
+        "1. Answer primarily from the provided context documents.\n"
+        "2. You KNOW today's date (shown above). Use it freely to reason about deadlines, "
+        "validity, expiry, past/future events, or any time-sensitive question — even if the "
+        "documents do not mention 'today'. For example: if a booking check-out date has already "
+        "passed relative to today, say it is no longer valid.\n"
+        "3. If the context contains no relevant information at all, say: "
         "'I don't know based on the provided documents.'\n"
-        "3. Do not guess, infer beyond the text, or bring in general knowledge.\n"
-        "4. Quote or reference the source when possible.\n\n"
+        "4. Quote or reference the source document when possible.\n"
+        "5. Do NOT invent facts not present in the context, but DO use logical reasoning "
+        "that combines context facts with today's date.\n\n"
         f"CONTEXT:\n{context}\n\n"
         f"QUESTION: {query}\n\n"
-        "ANSWER (from context only):"
+        "ANSWER:"
     )

@@ -160,8 +160,8 @@ export function DocumentsPage() {
   }
 
   const statCards = [
-    { label: 'Total Documents', value: stats?.total_documents ?? 0, icon: Files, color: 'text-blue-500' },
-    { label: 'Total Chunks', value: stats?.total_chunks ?? 0, icon: Layers, color: 'text-purple-500' },
+    { label: 'Total Documents', value: stats?.total_documents ?? 0, icon: Files, color: 'text-primary' },
+    { label: 'Total Chunks', value: stats?.total_chunks ?? 0, icon: Layers, color: 'text-accent' },
     { label: 'Vector Count', value: stats?.vector_count ?? 0, icon: Database, color: 'text-green-500' },
     { label: 'Storage Used', value: formatBytes(stats?.storage_used_bytes ?? 0), icon: HardDrive, color: 'text-orange-500' },
   ]
@@ -218,7 +218,7 @@ export function DocumentsPage() {
           <Card className="border-border/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
-                <Globe className="w-4 h-4 text-blue-500" /> Add Website URL
+                <Globe className="w-4 h-4 text-primary" /> Add Website URL
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -262,7 +262,7 @@ export function DocumentsPage() {
           <Card className="border-border/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
-                <Type className="w-4 h-4 text-purple-500" /> Add Text Content
+                <Type className="w-4 h-4 text-accent" /> Add Text Content
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -396,9 +396,9 @@ export function DocumentsPage() {
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               {doc.source_type === 'url'
-                                ? <Globe className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                ? <Globe className="w-4 h-4 text-primary flex-shrink-0" />
                                 : doc.source_type === 'text'
-                                ? <Type className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                                ? <Type className="w-4 h-4 text-accent flex-shrink-0" />
                                 : <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
                               <div className="min-w-0">
                                 <p className="text-sm font-medium truncate max-w-[200px]">
@@ -429,7 +429,7 @@ export function DocumentsPage() {
                           <td className="hidden lg:table-cell p-3 text-sm text-muted-foreground whitespace-nowrap">{formatDate(doc.upload_date)}</td>
                           <td className="p-3">
                             <div className="flex items-center gap-1.5">
-                              <StatusIcon className={cn('w-3.5 h-3.5', doc.status === 'processing' && 'animate-spin', doc.status === 'indexed' && 'text-green-500', doc.status === 'failed' && 'text-destructive', doc.status === 'pending' && 'text-yellow-500', doc.status === 'processing' && 'text-blue-500')} />
+                              <StatusIcon className={cn('w-3.5 h-3.5', doc.status === 'processing' && 'animate-spin', doc.status === 'indexed' && 'text-green-500', doc.status === 'failed' && 'text-destructive', doc.status === 'pending' && 'text-yellow-500', doc.status === 'processing' && 'text-primary')} />
                               <Badge variant={status.variant as any} className="text-xs">{status.label}</Badge>
                             </div>
                           </td>

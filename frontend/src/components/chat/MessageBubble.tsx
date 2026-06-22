@@ -23,18 +23,22 @@ export function MessageBubble({ message }: Props) {
 
   return (
     <div className={cn('flex gap-3 animate-fade-in', isUser ? 'flex-row-reverse' : 'flex-row')}>
+      {/* Avatar */}
       <div className={cn(
         'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold',
-        isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground border border-border'
+        isUser
+          ? 'bubble-user'
+          : 'bg-secondary text-secondary-foreground border border-border'
       )}>
         {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
       </div>
 
+      {/* Bubble */}
       <div className={cn('group relative max-w-[80%] flex flex-col', isUser ? 'items-end' : 'items-start')}>
         <div className={cn(
-          'rounded-2xl px-4 py-3 text-sm',
+          'rounded-2xl px-4 py-3 text-sm leading-relaxed',
           isUser
-            ? 'bg-primary text-primary-foreground rounded-tr-sm'
+            ? 'bubble-user rounded-tr-sm'
             : 'bg-card border border-border rounded-tl-sm'
         )}>
           {isUser ? (
@@ -61,7 +65,10 @@ export function MessageBubble({ message }: Props) {
                     const match = /language-(\w+)/.exec(className || '')
                     const isInline = !match
                     return isInline ? (
-                      <code className={cn('bg-muted px-1.5 py-0.5 rounded text-sm font-mono', className)} {...props}>
+                      <code
+                        className={cn('bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary', className)}
+                        {...props}
+                      >
                         {children}
                       </code>
                     ) : (
@@ -70,7 +77,7 @@ export function MessageBubble({ message }: Props) {
                           style={oneDark}
                           language={match[1]}
                           PreTag="div"
-                          customStyle={{ margin: 0, borderRadius: '0.5rem', fontSize: '0.8rem' }}
+                          customStyle={{ margin: 0, borderRadius: '0.625rem', fontSize: '0.8rem' }}
                         >
                           {String(children).replace(/\n$/, '')}
                         </SyntaxHighlighter>
@@ -86,6 +93,7 @@ export function MessageBubble({ message }: Props) {
           )}
         </div>
 
+        {/* Meta row */}
         <div className={cn(
           'flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity',
           isUser ? 'flex-row-reverse' : 'flex-row'
@@ -93,11 +101,13 @@ export function MessageBubble({ message }: Props) {
           <span className="text-xs text-muted-foreground">{formatRelativeTime(message.timestamp)}</span>
           {!isUser && (
             <button onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors">
-              {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+              {copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
             </button>
           )}
           {!isUser && message.completion_tokens > 0 && (
-            <span className="text-xs text-muted-foreground">{message.completion_tokens} tokens</span>
+            <span className="badge-gold rounded-full px-1.5 py-0.5 text-[10px]">
+              {message.completion_tokens} tokens
+            </span>
           )}
         </div>
       </div>

@@ -2,115 +2,292 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════
+   UAE DIGNITY THEME — Emirates Green × Desert Gold × Pearl White
+   Primary:  #007A3D (Emirates Flag Green)
+   Accent:   #C9A84C (Desert Gold)
+   Light bg: #F7F4EE (Pearl Cream)
+   Font:     Cairo — dignified bilingual (Arabic/Latin)
+═══════════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
+    /* ── Surfaces ─────────────────────────────────────── */
+    --background:        43 35% 97%;   /* Pearl cream   #F7F4EE */
+    --foreground:        150 55% 8%;   /* Deep forest   #071B0F */
+    --card:              0 0% 100%;    /* Pure white             */
+    --card-foreground:   150 55% 8%;
+    --popover:           0 0% 100%;
+    --popover-foreground: 150 55% 8%;
+
+    /* ── UAE Emirates Green ───────────────────────────── */
+    --primary:           150 100% 24%;  /* #007A3D */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Gold-tinted cream secondary ─────────────────── */
+    --secondary:         43 55% 93%;
+    --secondary-foreground: 150 60% 16%;
+
+    /* ── Muted surfaces ───────────────────────────────── */
+    --muted:             150 18% 95%;
+    --muted-foreground:  150 18% 42%;
+
+    /* ── UAE Gold accent ─────────────────────────────── */
+    --accent:            41 62% 52%;    /* #C9A84C */
+    --accent-foreground: 150 100% 8%;
+
+    /* ── Semantic ─────────────────────────────────────── */
+    --destructive:       0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── Borders & inputs ─────────────────────────────── */
+    --border:  150 18% 87%;
+    --input:   150 18% 87%;
+    --ring:    150 100% 24%;
+
+    /* ── Geometry ─────────────────────────────────────── */
+    --radius: 0.625rem;
+
+    /* ── Custom UAE tokens ────────────────────────────── */
+    --gold:       41 62% 52%;
+    --gold-light: 41 62% 92%;
+    --green-deep: 150 100% 18%;   /* #005A2E hover */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 6%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    /* ── Dark forest surfaces ─────────────────────────── */
+    --background:        150 38% 7%;   /* #0A1910 */
+    --foreground:        43 35% 94%;   /* Warm cream */
+    --card:              150 32% 10%;  /* #0F2318 */
+    --card-foreground:   43 35% 94%;
+    --popover:           150 32% 10%;
+    --popover-foreground: 43 35% 94%;
+
+    /* ── UAE Green (brightened for dark) ─────────────── */
+    --primary:           150 65% 42%;  /* #25A85E */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Muted dark surfaces ─────────────────────────── */
+    --secondary:         150 22% 16%;
+    --secondary-foreground: 43 35% 94%;
+    --muted:             150 22% 16%;
+    --muted-foreground:  150 14% 60%;
+
+    /* ── Gold stays constant ─────────────────────────── */
+    --accent:            41 62% 52%;
+    --accent-foreground: 150 100% 5%;
+
+    /* ── Semantic ─────────────────────────────────────── */
+    --destructive:       0 63% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── Borders & inputs ─────────────────────────────── */
+    --border:  150 22% 18%;
+    --input:   150 22% 18%;
+    --ring:    150 65% 42%;
+
+    /* ── Custom dark tokens ───────────────────────────── */
+    --gold:       41 62% 52%;
+    --gold-light: 41 35% 18%;
+    --green-deep: 150 65% 35%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
   }
-  html {
-    scroll-behavior: smooth;
+  html { scroll-behavior: smooth; }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cairo', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
+  /* Selection color — UAE green */
+  ::selection { background: hsl(var(--primary) / 0.2); }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
+/* ── Scrollbar ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-full;
+  background: hsl(var(--primary) / 0.3);
+  border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground/50;
+  background: hsl(var(--primary) / 0.55);
 }
 
-/* Glassmorphism utilities */
+/* ── UAE Gold accent line (reusable) ─────────────────────────── */
+.uae-gold-bar {
+  height: 3px;
+  background: linear-gradient(90deg,
+    hsl(var(--primary)),
+    hsl(var(--gold)),
+    hsl(var(--primary))
+  );
+}
+
+/* ── Sidebar UAE gradient header ─────────────────────────────── */
+.sidebar-brand {
+  background: linear-gradient(
+    160deg,
+    hsl(var(--green-deep)) 0%,
+    hsl(var(--primary)) 60%,
+    hsl(150 80% 28%) 100%
+  );
+}
+
+/* ── Auth page UAE split panel ───────────────────────────────── */
+.auth-panel-left {
+  background: linear-gradient(
+    145deg,
+    hsl(var(--green-deep)) 0%,
+    hsl(var(--primary)) 55%,
+    hsl(150 75% 30%) 100%
+  );
+}
+
+/* ── Glassmorphism ───────────────────────────────────────────── */
 .glass {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
-
 .dark .glass {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Shimmer loading skeleton */
+/* ── Gold shimmer loading skeleton ──────────────────────────── */
 .shimmer {
-  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--accent)) 50%, hsl(var(--muted)) 75%);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--gold-light)) 50%,
+    hsl(var(--muted)) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
 }
 
-/* Message markdown styles */
-.markdown-body h1 { @apply text-2xl font-bold mb-3 mt-4; }
-.markdown-body h2 { @apply text-xl font-semibold mb-2 mt-3; }
-.markdown-body h3 { @apply text-lg font-semibold mb-2 mt-2; }
+/* ── Message markdown ────────────────────────────────────────── */
+.markdown-body { font-size: 0.9375rem; line-height: 1.7; }
+.markdown-body h1 { @apply text-2xl font-bold mb-3 mt-5; }
+.markdown-body h2 { @apply text-xl font-semibold mb-2 mt-4; }
+.markdown-body h3 { @apply text-lg font-semibold mb-2 mt-3; }
 .markdown-body p  { @apply mb-3 leading-relaxed; }
-.markdown-body ul { @apply list-disc list-inside mb-3 space-y-1; }
-.markdown-body ol { @apply list-decimal list-inside mb-3 space-y-1; }
+.markdown-body ul { @apply list-disc list-inside mb-3 space-y-1.5; }
+.markdown-body ol { @apply list-decimal list-inside mb-3 space-y-1.5; }
 .markdown-body li { @apply leading-relaxed; }
-.markdown-body code:not(pre code) { @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono; }
-.markdown-body pre { @apply rounded-lg overflow-hidden mb-3; }
-.markdown-body blockquote { @apply border-l-4 border-primary pl-4 italic text-muted-foreground mb-3; }
-.markdown-body table { @apply w-full border-collapse mb-3; }
-.markdown-body th { @apply border border-border bg-muted px-3 py-2 text-left font-semibold; }
+.markdown-body code:not(pre code) {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  color: hsl(var(--primary));
+}
+.markdown-body pre { @apply rounded-xl overflow-hidden mb-3; }
+.markdown-body blockquote {
+  @apply border-l-4 pl-4 italic text-muted-foreground mb-3 rounded-r-lg;
+  border-color: hsl(var(--gold));
+  background: hsl(var(--gold-light));
+  padding: 0.5rem 1rem;
+}
+.markdown-body table  { @apply w-full border-collapse mb-3 text-sm; }
+.markdown-body th {
+  @apply px-3 py-2 text-left font-semibold text-primary-foreground;
+  background: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary) / 0.3);
+}
 .markdown-body td { @apply border border-border px-3 py-2; }
-.markdown-body a  { @apply text-primary underline underline-offset-2 hover:opacity-80; }
+.markdown-body tr:nth-child(even) { background: hsl(var(--muted)); }
+.markdown-body a {
+  @apply underline underline-offset-2;
+  color: hsl(var(--primary));
+}
+.markdown-body a:hover { color: hsl(var(--green-deep)); }
 .markdown-body strong { @apply font-semibold; }
-.markdown-body hr { @apply border-border my-4; }
+.markdown-body hr {
+  @apply my-5;
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(var(--gold)), transparent);
+}
+
+/* ── Focus ring — UAE green ──────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+/* ── Suggestion cards hover gradient ────────────────────────── */
+.suggestion-card {
+  transition: all 0.2s ease;
+  border: 1px solid hsl(var(--border));
+}
+.suggestion-card:hover {
+  border-color: hsl(var(--primary) / 0.5);
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.04), hsl(var(--gold) / 0.04));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsl(var(--primary) / 0.1);
+}
+
+/* ── Nav item active — green pill ────────────────────────────── */
+.nav-active {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.35);
+}
+
+/* ── Primary button glow ─────────────────────────────────────── */
+.btn-uae {
+  background: linear-gradient(135deg, hsl(var(--green-deep)), hsl(var(--primary)));
+  box-shadow: 0 2px 10px hsl(var(--primary) / 0.3);
+  transition: all 0.2s ease;
+}
+.btn-uae:hover {
+  box-shadow: 0 4px 16px hsl(var(--primary) / 0.45);
+  transform: translateY(-1px);
+}
+.btn-uae:active { transform: translateY(0); }
+
+/* ── Gold badge / tag ─────────────────────────────────────────── */
+.badge-gold {
+  background: hsl(var(--gold-light));
+  color: hsl(41 75% 28%);
+  border: 1px solid hsl(var(--gold) / 0.35);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── User chat bubble — UAE green ────────────────────────────── */
+.bubble-user {
+  background: linear-gradient(135deg, hsl(var(--green-deep)), hsl(var(--primary)));
+  color: white;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.25);
+}
+
+/* ── Keyframes ───────────────────────────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50%       { box-shadow: 0 0 0 6px hsl(var(--primary) / 0); }
+}

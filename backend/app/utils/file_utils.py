@@ -110,15 +110,55 @@ def get_storage_used() -> int:
     return 0  # Tracked via Document.file_size in the database
 
 
+def _table_to_text(table: list) -> str:
+    """Convert a pdfplumber table (list of rows) to readable key:value lines."""
+    lines = []
+    for row in table:
+        cells = [str(c).strip() if c else '' for c in row]
+        non_empty = [c for c in cells if c]
+        if not non_empty:
+            continue
+        # Even-column rows → pair as "Label: Value" (handles 2-col and 4-col tables)
+        if len(non_empty) % 2 == 0:
+            for i in range(0, len(non_empty), 2):
+                if non_empty[i] and non_empty[i + 1]:
+                    lines.append(f"{non_empty[i]}: {non_empty[i + 1]}")
+                elif non_empty[i]:
+                    lines.append(non_empty[i])
+        else:
+            lines.append(" | ".join(non_empty))
+    return "\n".join(lines)
+
+
 def _extract_pdf(path: Path) -> str:
-    text_parts = []
-    with open(path, "rb") as f:
-        reader = PyPDF2.PdfReader(f)
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                text_parts.append(text.strip())
-    return "\n\n".join(text_parts)
+    try:
+        import pdfplumber
+        text_parts = []
+        with pdfplumber.open(path) as pdf:
+            for page in pdf.pages:
+                parts = []
+                # pdfplumber gives better reading-order text than PyPDF2
+                text = page.extract_text()
+                if text and text.strip():
+                    parts.append(text.strip())
+                # Explicit table extraction ensures cell associations are preserved
+                for table in page.extract_tables():
+                    table_text = _table_to_text(table)
+                    if table_text:
+                        parts.append(table_text)
+                if parts:
+                    text_parts.append("\n\n".join(parts))
+        return "\n\n".join(text_parts)
+    except ImportError:
+        # Fallback to PyPDF2
+        text_parts = []
+        with open(path, "rb") as f:
+            reader = PyPDF2.PdfReader(f)
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    text_parts.append(text.strip())
+        return "\n\n".join(text_parts)
 
 
 def _extract_txt(path: Path) -> str:

@@ -99,6 +99,7 @@ export function ChatPage() {
   }
 
   const handleSend = async (message: string, allowWebSearch = false) => {
+    setSourceSelectorOpen(false)
     const userMsg: Message = {
       id: Date.now(),
       role: 'user',

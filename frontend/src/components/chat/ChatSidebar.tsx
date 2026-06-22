@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, Trash2, Edit2, MessageSquare, Check, X } from 'lucide-react'
+import { Plus, Search, Trash2, Edit2, MessageSquare, Check, X, Eraser } from 'lucide-react'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,10 +16,12 @@ interface Props {
 }
 
 export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }: Props) {
-  const { conversations, activeConversationId, removeConversation, updateConversationTitle } = useChatStore()
+  const { conversations, activeConversationId, removeConversation, updateConversationTitle, clearConversations } = useChatStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [renamingId, setRenamingId] = useState<number | null>(null)
   const [renameValue, setRenameValue] = useState('')
+  const [clearConfirm, setClearConfirm] = useState(false)
+  const [clearing, setClearing] = useState(false)
   const { toast } = useToast()
 
   const filtered = conversations.filter((c) =>
@@ -34,6 +36,26 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
       toast({ title: 'Conversation deleted', variant: 'default' })
     } catch {
       toast({ title: 'Failed to delete', variant: 'destructive' })
+    }
+  }
+
+  const handleClearAll = async () => {
+    if (!clearConfirm) {
+      setClearConfirm(true)
+      // auto-cancel after 4 s if user doesn't confirm
+      setTimeout(() => setClearConfirm(false), 4000)
+      return
+    }
+    setClearing(true)
+    try {
+      await chatService.deleteAllConversations()
+      clearConversations()
+      toast({ title: 'All chats cleared' })
+    } catch {
+      toast({ title: 'Failed to clear chats', variant: 'destructive' })
+    } finally {
+      setClearing(false)
+      setClearConfirm(false)
     }
   }
 
@@ -167,6 +189,38 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
             </div>
           ))}
         </div>
+
+        {/* Clear All footer — only shown when there are conversations */}
+        {conversations.length > 0 && (
+          <div className="p-3 border-t border-border">
+            {clearConfirm ? (
+              <div className="flex items-center gap-2 animate-fade-in">
+                <p className="flex-1 text-xs text-destructive font-medium">Delete all {conversations.length} chats?</p>
+                <button
+                  onClick={handleClearAll}
+                  disabled={clearing}
+                  className="text-xs font-semibold text-destructive hover:text-destructive/80 px-2 py-1 rounded border border-destructive/30 hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                >
+                  {clearing ? '…' : 'Yes'}
+                </button>
+                <button
+                  onClick={() => setClearConfirm(false)}
+                  className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border hover:bg-accent transition-colors"
+                >
+                  No
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleClearAll}
+                className="flex items-center gap-2 w-full text-xs text-muted-foreground hover:text-destructive transition-colors px-2 py-1.5 rounded-lg hover:bg-destructive/8 group"
+              >
+                <Eraser className="w-3.5 h-3.5 group-hover:text-destructive" />
+                Clear all chats
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </>
   )

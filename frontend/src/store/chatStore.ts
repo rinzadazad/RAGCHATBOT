@@ -28,6 +28,7 @@ interface ChatState {
   toggleDebugPanel: () => void
   updateConversationTitle: (id: number, title: string) => void
   removeConversation: (id: number) => void
+  clearConversations: () => void
   addConversation: (conv: Conversation) => void
   resetChatStore: () => void
 }
@@ -61,6 +62,8 @@ export const useChatStore = create<ChatState>((set) => ({
       conversations: s.conversations.filter((c) => c.id !== id),
       activeConversationId: s.activeConversationId === id ? null : s.activeConversationId,
     })),
+  clearConversations: () =>
+    set({ conversations: [], activeConversationId: null, messages: [], streamingMessage: '' }),
   addConversation: (conv) =>
     set((s) => ({ conversations: [conv, ...s.conversations] })),
   resetChatStore: () =>

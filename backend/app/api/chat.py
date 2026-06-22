@@ -198,6 +198,15 @@ def rename_conversation(
     return ConversationOut.model_validate(conv)
 
 
+@router.delete("/all", status_code=204)
+def delete_all_conversations(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    db.query(Conversation).filter(Conversation.user_id == current_user.id).delete()
+    db.commit()
+
+
 @router.delete("/{conversation_id}", status_code=204)
 def delete_conversation(
     conversation_id: int,

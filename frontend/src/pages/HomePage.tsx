@@ -242,6 +242,13 @@ export function HomePage() {
           </ul>
         </section>
 
+        {/* ── Footer ─────────────────────────────────────────── */}
+        <div className="pb-6 text-center">
+          <p className="text-[11px] text-muted-foreground/50 tracking-wide">
+            Developed by <span className="font-semibold text-muted-foreground/70">RINZ</span>
+          </p>
+        </div>
+
       </div>
     </div>
   )

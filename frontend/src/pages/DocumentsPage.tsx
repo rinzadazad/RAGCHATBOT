@@ -32,6 +32,7 @@ export function DocumentsPage() {
   const queryClient = useQueryClient()
   const { user } = useAuthStore()
   const isAdmin = user?.role === 'admin'
+  const userId = user?.id
 
   // URL ingestion state
   const [urlValue, setUrlValue] = useState('')
@@ -61,8 +62,8 @@ export function DocumentsPage() {
   }
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['documents'] })
-    queryClient.invalidateQueries({ queryKey: ['document-stats'] })
+    queryClient.invalidateQueries({ queryKey: ['documents', userId] })
+    queryClient.invalidateQueries({ queryKey: ['document-stats', userId] })
   }
 
   const urlMutation = useMutation({
@@ -97,8 +98,9 @@ export function DocumentsPage() {
   })
 
   const { data: documents = [], isLoading } = useQuery({
-    queryKey: ['documents'],
+    queryKey: ['documents', userId],
     queryFn: documentService.list,
+    enabled: !!userId,
     refetchInterval: (query) => {
       const data = query.state.data as Document[] | undefined
       return data?.some((d) => d.status === 'processing' || d.status === 'pending') ? 3000 : false
@@ -106,8 +108,9 @@ export function DocumentsPage() {
   })
 
   const { data: stats } = useQuery({
-    queryKey: ['document-stats'],
+    queryKey: ['document-stats', userId],
     queryFn: documentService.getStats,
+    enabled: !!userId,
     refetchInterval: 10000,
   })
 
@@ -120,8 +123,8 @@ export function DocumentsPage() {
   const handleDelete = async (id: number) => {
     try {
       await documentService.delete(id)
-      queryClient.invalidateQueries({ queryKey: ['documents'] })
-      queryClient.invalidateQueries({ queryKey: ['document-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['documents', userId] })
+      queryClient.invalidateQueries({ queryKey: ['document-stats', userId] })
       toast({ title: 'Document deleted' })
     } catch {
       toast({ title: 'Delete failed', variant: 'destructive' })
@@ -134,7 +137,7 @@ export function DocumentsPage() {
     try {
       await documentService.reindex(ids)
       setSelected(new Set())
-      queryClient.invalidateQueries({ queryKey: ['documents'] })
+      queryClient.invalidateQueries({ queryKey: ['documents', userId] })
       toast({ title: `Reindexing ${ids.length} document(s)` })
     } catch {
       toast({ title: 'Reindex failed', variant: 'destructive' })
@@ -144,7 +147,7 @@ export function DocumentsPage() {
   const handleRetry = async (id: number) => {
     try {
       await documentService.reindex([id])
-      queryClient.invalidateQueries({ queryKey: ['documents'] })
+      queryClient.invalidateQueries({ queryKey: ['documents', userId] })
       toast({ title: 'Document queued for reprocessing' })
     } catch {
       toast({ title: 'Retry failed', variant: 'destructive' })

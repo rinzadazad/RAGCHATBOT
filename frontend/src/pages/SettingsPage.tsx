@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { settingsService } from '@/services/settingsService'
+import { useAuthStore } from '@/store/authStore'
 import { useToast } from '@/hooks/use-toast'
 import type { Settings } from '@/types'
 
@@ -38,10 +39,13 @@ export function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const { user } = useAuthStore()
+  const userId = user?.id
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['settings'],
+    queryKey: ['settings', userId],
     queryFn: settingsService.get,
+    enabled: !!userId,
   })
 
   const { data: models = [] } = useQuery({
@@ -57,7 +61,7 @@ export function SettingsPage() {
     setSaving(true)
     try {
       await settingsService.update(form)
-      queryClient.invalidateQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['settings', userId] })
       toast({ title: 'Settings saved', variant: 'default' })
     } catch {
       toast({ title: 'Failed to save settings', variant: 'destructive' })

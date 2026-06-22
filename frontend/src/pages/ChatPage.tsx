@@ -9,6 +9,7 @@ import { MessageInput } from '@/components/chat/MessageInput'
 import { ModelSelector } from '@/components/chat/ModelSelector'
 import { RagDebugPanel } from '@/components/chat/RagDebugPanel'
 import { useChatStore } from '@/store/chatStore'
+import { useAuthStore } from '@/store/authStore'
 import { chatService } from '@/services/chatService'
 import { documentService } from '@/services/documentService'
 import { settingsService } from '@/services/settingsService'
@@ -31,6 +32,9 @@ export function ChatPage() {
     setActiveConversationId,
   } = useChatStore()
 
+  const { user } = useAuthStore()
+  const userId = user?.id
+
   const [selectedModel, setSelectedModel] = useState('llama-3.3-70b-versatile')
   const [loadingConversation, setLoadingConversation] = useState(false)
   const [pendingWebSearch, setPendingWebSearch] = useState<PendingWebSearch | null>(null)
@@ -40,29 +44,33 @@ export function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
+  // Queries are keyed by userId — cache can never bleed across accounts
   const { data: allDocs = [] } = useQuery<Document[]>({
-    queryKey: ['documents'],
+    queryKey: ['documents', userId],
     queryFn: documentService.list,
     staleTime: 30_000,
+    enabled: !!userId,
   })
   const indexedDocs = allDocs.filter((d) => d.status === 'indexed')
 
   useQuery({
-    queryKey: ['conversations'],
+    queryKey: ['conversations', userId],
     queryFn: async () => {
       const convs = await chatService.getHistory()
       setConversations(convs)
       return convs
     },
+    enabled: !!userId,
   })
 
   useQuery({
-    queryKey: ['default-settings'],
+    queryKey: ['default-settings', userId],
     queryFn: async () => {
       const s = await settingsService.get()
       setSelectedModel(s.model_name)
       return s
     },
+    enabled: !!userId,
   })
 
   useEffect(() => {

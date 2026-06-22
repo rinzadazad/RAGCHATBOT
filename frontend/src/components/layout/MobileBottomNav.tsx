@@ -11,7 +11,10 @@ const navItems = [
 
 export function MobileBottomNav() {
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-md border-t border-border safe-area-pb">
+    <nav
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-md border-t border-border"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
@@ -19,7 +22,7 @@ export function MobileBottomNav() {
             to={to}
             className={({ isActive }) =>
               cn(
-                'flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all min-w-0 flex-1',
+                'flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all flex-1',
                 isActive ? 'text-primary' : 'text-muted-foreground',
               )
             }

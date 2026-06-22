@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { MessageSquare, FileText, Search, Settings } from 'lucide-react'
+import { House, MessageSquare, FileText, Search, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
+  { to: '/home',      icon: House,         label: 'Home'      },
   { to: '/chat',      icon: MessageSquare, label: 'Chat'      },
-  { to: '/documents', icon: FileText,      label: 'Knowledge' },
+  { to: '/documents', icon: FileText,      label: 'Docs'      },
   { to: '/search',    icon: Search,        label: 'Search'    },
   { to: '/settings',  icon: Settings,      label: 'Settings'  },
 ]

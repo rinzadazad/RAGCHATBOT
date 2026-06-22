@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { MessageSquare, FileText, Settings, Search, LogOut, Bot, Moon, Sun } from 'lucide-react'
+import { MessageSquare, FileText, Settings, Search, LogOut, Bot, Moon, Sun, House } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -8,10 +8,11 @@ import { useThemeStore } from '@/store/themeStore'
 import { useChatStore } from '@/store/chatStore'
 
 const navItems = [
-  { to: '/chat',      icon: MessageSquare, label: 'Chat' },
+  { to: '/home',      icon: House,         label: 'Home'           },
+  { to: '/chat',      icon: MessageSquare, label: 'Chat'           },
   { to: '/documents', icon: FileText,      label: 'Knowledge Base' },
-  { to: '/search',    icon: Search,        label: 'Search' },
-  { to: '/settings',  icon: Settings,      label: 'Settings' },
+  { to: '/search',    icon: Search,        label: 'Search'         },
+  { to: '/settings',  icon: Settings,      label: 'Settings'       },
 ]
 
 export function Sidebar() {

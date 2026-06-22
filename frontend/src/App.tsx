@@ -7,6 +7,7 @@ import { MainLayout } from '@/layouts/MainLayout'
 import { ProtectedRoute, PublicOnlyRoute } from '@/routes/ProtectedRoute'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
+import { HomePage } from '@/pages/HomePage'
 import { ChatPage } from '@/pages/ChatPage'
 import { DocumentsPage } from '@/pages/DocumentsPage'
 import { SearchPage } from '@/pages/SearchPage'
@@ -47,6 +48,7 @@ export default function App() {
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
+              <Route path="/home" element={<HomePage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/search" element={<SearchPage />} />
@@ -54,8 +56,8 @@ export default function App() {
             </Route>
           </Route>
 
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/chat" replace />} />
+          {/* Catch-all → home */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

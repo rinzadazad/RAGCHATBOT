@@ -39,7 +39,7 @@ export function Sidebar() {
           <Bot className="w-5 h-5 text-white" />
         </div>
         <div className="hidden lg:block">
-          <p className="font-black text-base tracking-tight text-white leading-tight">RINZ Chatbot</p>
+          <p className="font-black text-base tracking-tight text-white leading-tight">SafeChat AI</p>
           <p className="text-[10px] text-white/60 tracking-widest uppercase leading-none mt-0.5">AI Assistant</p>
         </div>
       </div>

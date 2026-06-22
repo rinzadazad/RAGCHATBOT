@@ -40,7 +40,7 @@ export function AuthLayout() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight mb-2">RINZ Chatbot</h1>
+          <h1 className="text-3xl font-black tracking-tight mb-2">SafeChat AI</h1>
           <p className="text-white/75 text-sm font-light mb-1" style={{ fontWeight: 300 }}>
             AI-Powered Knowledge Assistant
           </p>
@@ -82,7 +82,7 @@ export function AuthLayout() {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
             </svg>
           </div>
-          <h1 className="text-xl font-black tracking-tight">RINZ Chatbot</h1>
+          <h1 className="text-xl font-black tracking-tight">SafeChat AI</h1>
         </div>
 
         <div className="w-full max-w-md">

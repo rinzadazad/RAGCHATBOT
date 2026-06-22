@@ -86,7 +86,7 @@ export function HomePage() {
             Welcome back, {firstName} 👋
           </h1>
           <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-xl mb-8">
-            RINZ Chatbot reads your documents and answers your questions —
+            SafeChat AI reads your documents and answers your questions —
             accurately, instantly, and only from content you uploaded.
           </p>
 
@@ -130,11 +130,11 @@ export function HomePage() {
         <section>
           <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            What is RINZ Chatbot?
+            What is SafeChat AI?
           </h2>
           <div className="rounded-2xl border border-border/60 bg-card/40 p-5 space-y-3 text-sm text-muted-foreground leading-relaxed">
             <p>
-              <strong className="text-foreground">RINZ Chatbot</strong> is your personal AI assistant that reads
+              <strong className="text-foreground">SafeChat AI</strong> is your personal AI assistant that reads
               your own documents — PDFs, Word files, websites, or plain text — and answers questions about them.
             </p>
             <p>

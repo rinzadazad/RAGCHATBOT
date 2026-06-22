@@ -192,6 +192,7 @@ export function DocumentsPage() {
   ]
 
   return (
+    <>
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* ── Top bar ───────────────────────────────────────── */}
@@ -527,5 +528,6 @@ export function DocumentsPage() {
       onConfirm={confirmDelete}
       onCancel={() => setDeleteTarget(null)}
     />
+    </>
   )
 }

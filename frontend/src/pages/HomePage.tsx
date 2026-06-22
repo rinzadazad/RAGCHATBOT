@@ -243,9 +243,13 @@ export function HomePage() {
         </section>
 
         {/* ── Footer ─────────────────────────────────────────── */}
-        <div className="pb-6 text-center">
+        <div className="pb-6 text-center space-y-1.5">
           <p className="text-[11px] text-muted-foreground/50 tracking-wide">
             Developed by <span className="font-semibold text-muted-foreground/70">RINZ</span>
+          </p>
+          <p className="text-[11px] text-muted-foreground/45 leading-relaxed max-w-sm mx-auto">
+            Want a fully offline version with no internet connection for maximum data privacy?{' '}
+            <span className="text-muted-foreground/65 font-medium">Contact the developer.</span>
           </p>
         </div>
 

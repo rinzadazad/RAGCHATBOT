@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
+import { useChatStore } from '@/store/chatStore'
 import { authService } from '@/services/authService'
 import { useToast } from '@/hooks/use-toast'
 
@@ -13,10 +14,11 @@ export function LoginPage() {
   const [password, setPassword]   = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading]     = useState(false)
-  const { setAuth }   = useAuthStore()
-  const { toast }     = useToast()
-  const navigate      = useNavigate()
-  const queryClient   = useQueryClient()
+  const { setAuth }       = useAuthStore()
+  const { resetChatStore } = useChatStore()
+  const { toast }         = useToast()
+  const navigate          = useNavigate()
+  const queryClient       = useQueryClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,6 +26,7 @@ export function LoginPage() {
     try {
       const data = await authService.login(email, password)
       queryClient.clear()
+      resetChatStore()
       setAuth(data.user, data.access_token)
       navigate('/chat')
     } catch (err: any) {

@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
+import { useChatStore } from '@/store/chatStore'
 import { authService } from '@/services/authService'
 import { useToast } from '@/hooks/use-toast'
 
@@ -14,9 +15,10 @@ export function RegisterPage() {
   const [touched, setTouched]   = useState({ name: false, email: false, password: false })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading]   = useState(false)
-  const { setAuth } = useAuthStore()
-  const { toast }   = useToast()
-  const navigate    = useNavigate()
+  const { setAuth }        = useAuthStore()
+  const { resetChatStore } = useChatStore()
+  const { toast }          = useToast()
+  const navigate           = useNavigate()
 
   const nameError     = touched.name     && name.trim().length < 2           ? 'Name must be at least 2 characters'   : ''
   const emailError    = touched.email    && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter a valid email address' : ''
@@ -30,6 +32,7 @@ export function RegisterPage() {
     setLoading(true)
     try {
       const data = await authService.register(name.trim(), email.trim(), password)
+      resetChatStore()
       setAuth(data.user, data.access_token)
       navigate('/chat')
     } catch (err: any) {

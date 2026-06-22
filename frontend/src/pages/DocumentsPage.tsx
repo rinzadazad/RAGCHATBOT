@@ -23,6 +23,24 @@ const statusConfig: Record<DocumentStatus, { label: string; icon: React.ElementT
   failed:     { label: 'Failed',     icon: AlertCircle,   variant: 'destructive' },
 }
 
+function TipCell({ text, className }: { text: string; className?: string }) {
+  return (
+    <div className="relative group/tip min-w-0">
+      <p className={cn('truncate', className)}>{text}</p>
+      <div className="pointer-events-none absolute bottom-full left-0 mb-1.5 z-50
+                      hidden group-hover/tip:block">
+        <div className="bg-popover border border-border text-popover-foreground
+                        text-xs px-2.5 py-1.5 rounded-lg shadow-uae-lg
+                        max-w-xs break-all whitespace-normal leading-relaxed">
+          {text}
+        </div>
+        {/* arrow */}
+        <div className="ml-3 w-2 h-2 rotate-45 bg-popover border-r border-b border-border -mt-1" />
+      </div>
+    </div>
+  )
+}
+
 type IngestTab = 'file' | 'url' | 'text'
 
 export function DocumentsPage() {
@@ -404,41 +422,21 @@ export function DocumentsPage() {
                               ? <Type     className="w-4 h-4 text-accent flex-shrink-0" />
                               : <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
                             <div className="min-w-0 flex-1">
-                              <p
-                                className="text-sm font-medium truncate"
-                                title={doc.keyword ?? doc.original_filename}
-                              >
-                                {doc.keyword ?? doc.original_filename}
-                              </p>
+                              <TipCell text={doc.keyword ?? doc.original_filename} className="text-sm font-medium" />
                               {doc.source_url && (
-                                <p
-                                  className="text-xs text-muted-foreground truncate"
-                                  title={doc.source_url}
-                                >
-                                  {doc.source_url}
-                                </p>
+                                <TipCell text={doc.source_url} className="text-xs text-muted-foreground mt-0.5" />
                               )}
                             </div>
                           </div>
                           {doc.error_message && (
-                            <p
-                              className="text-xs text-destructive mt-0.5 truncate"
-                              title={doc.error_message}
-                            >
-                              {doc.error_message}
-                            </p>
+                            <TipCell text={doc.error_message} className="text-xs text-destructive mt-0.5" />
                           )}
                         </td>
                         {isAdmin && (
                           <td className="hidden sm:table-cell p-3 max-w-0">
                             <div className="flex items-center gap-1.5 min-w-0">
                               <User className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                              <span
-                                className="text-xs text-muted-foreground truncate"
-                                title={doc.owner_email ?? '—'}
-                              >
-                                {doc.owner_email ?? '—'}
-                              </span>
+                              <TipCell text={doc.owner_email ?? '—'} className="text-xs text-muted-foreground" />
                             </div>
                           </td>
                         )}

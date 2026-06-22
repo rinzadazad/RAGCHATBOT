@@ -38,6 +38,8 @@ export function ChatPage() {
   const [selectedModel, setSelectedModel] = useState('llama-3.3-70b-versatile')
   const [loadingConversation, setLoadingConversation] = useState(false)
   const [pendingWebSearch, setPendingWebSearch] = useState<PendingWebSearch | null>(null)
+  const [webSearching, setWebSearching] = useState(false)
+  const [webSearchQuery, setWebSearchQuery] = useState('')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [selectedSourceIds, setSelectedSourceIds] = useState<Set<number>>(new Set())
   const [sourceSelectorOpen, setSourceSelectorOpen] = useState(false)
@@ -175,7 +177,8 @@ export function ChatPage() {
     if (!pendingWebSearch) return
     const { query, conversationId } = pendingWebSearch
     setPendingWebSearch(null)
-    setIsStreaming(true)
+    setWebSearchQuery(query)
+    setWebSearching(true)
 
     try {
       const sourceIds = selectedSourceIds.size > 0 ? Array.from(selectedSourceIds) : undefined
@@ -208,13 +211,15 @@ export function ChatPage() {
         retrievalChunks: response.retrieved_chunks,
       })
     } catch (err: any) {
+      // Restore the permission card so user can retry without retyping
+      setPendingWebSearch({ query, conversationId })
       toast({
         title: 'Web search failed',
-        description: err.response?.data?.detail ?? 'Network error',
+        description: err.response?.data?.detail ?? 'Network error. Click "Yes, search the web" to retry.',
         variant: 'destructive',
       })
     } finally {
-      setIsStreaming(false)
+      setWebSearching(false)
     }
   }
 
@@ -311,7 +316,7 @@ export function ChatPage() {
               ))}
 
               {/* Web search permission card */}
-              {pendingWebSearch && !isStreaming && (
+              {pendingWebSearch && !webSearching && (
                 <div className="flex gap-3 animate-fade-in">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
                     <Globe className="w-4 h-4 text-primary" />
@@ -345,8 +350,26 @@ export function ChatPage() {
                 </div>
               )}
 
-              {/* Streaming indicator */}
-              {isStreaming && (
+              {/* Web searching in-progress card */}
+              {webSearching && (
+                <div className="flex gap-3 animate-fade-in">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                    <Globe className="w-4 h-4 text-primary animate-spin" style={{ animationDuration: '2s' }} />
+                  </div>
+                  <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
+                      <p className="text-sm font-semibold text-primary">Searching the web…</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Looking up: <span className="italic">{webSearchQuery}</span>
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Streaming indicator (normal AI response loading) */}
+              {isStreaming && !webSearching && (
                 <div className="flex gap-3 animate-fade-in">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center">
                     <Bot className="w-4 h-4" />
@@ -365,7 +388,7 @@ export function ChatPage() {
                 </div>
               )}
 
-              {messages.length > 0 && !isStreaming && !pendingWebSearch && (
+              {messages.length > 0 && !isStreaming && !webSearching && !pendingWebSearch && (
                 <div className="flex justify-center pb-2">
                   <Button variant="ghost" size="sm" onClick={handleRegenerate} className="gap-2 text-muted-foreground">
                     <RefreshCw className="w-3.5 h-3.5" /> Regenerate

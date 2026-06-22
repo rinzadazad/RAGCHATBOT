@@ -453,7 +453,7 @@ export function ChatPage() {
           </div>
         )}
 
-        <MessageInput onSend={handleSend} isStreaming={isStreaming} />
+        <MessageInput onSend={handleSend} isStreaming={isStreaming} onFocus={() => setSourceSelectorOpen(false)} />
       </div>
 
       <RagDebugPanel />

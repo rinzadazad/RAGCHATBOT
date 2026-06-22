@@ -10,9 +10,10 @@ interface Props {
   isStreaming: boolean
   onStop?: () => void
   disabled?: boolean
+  onFocus?: () => void
 }
 
-export function MessageInput({ onSend, isStreaming, onStop, disabled }: Props) {
+export function MessageInput({ onSend, isStreaming, onStop, disabled, onFocus }: Props) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const remaining = MAX_CHARS - value.length
@@ -55,6 +56,7 @@ export function MessageInput({ onSend, isStreaming, onStop, disabled }: Props) {
             onChange={(e) => setValue(e.target.value)}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
+            onFocus={onFocus}
             placeholder="Ask anything about your documents..."
             disabled={disabled}
             rows={1}

@@ -370,9 +370,9 @@ export function DocumentsPage() {
                         className="rounded"
                       />
                     </th>
-                    <th className="text-left p-3 text-xs font-semibold text-muted-foreground">Name</th>
+                    <th className="text-left p-3 text-xs font-semibold text-muted-foreground w-[40%]">Name</th>
                     {isAdmin && (
-                      <th className="hidden sm:table-cell text-left p-3 text-xs font-semibold text-muted-foreground">Owner</th>
+                      <th className="hidden sm:table-cell text-left p-3 text-xs font-semibold text-muted-foreground w-[18%]">Owner</th>
                     )}
                     <th className="hidden sm:table-cell text-left p-3 text-xs font-semibold text-muted-foreground">Type</th>
                     <th className="hidden md:table-cell text-left p-3 text-xs font-semibold text-muted-foreground">Chunks</th>
@@ -396,31 +396,49 @@ export function DocumentsPage() {
                             className="rounded"
                           />
                         </td>
-                        <td className="p-3">
-                          <div className="flex items-center gap-2">
+                        <td className="p-3 max-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
                             {doc.source_type === 'url'
                               ? <Globe    className="w-4 h-4 text-primary flex-shrink-0" />
                               : doc.source_type === 'text'
                               ? <Type     className="w-4 h-4 text-accent flex-shrink-0" />
                               : <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium truncate max-w-[200px]">
+                            <div className="min-w-0 flex-1">
+                              <p
+                                className="text-sm font-medium truncate"
+                                title={doc.keyword ?? doc.original_filename}
+                              >
                                 {doc.keyword ?? doc.original_filename}
                               </p>
                               {doc.source_url && (
-                                <p className="text-xs text-muted-foreground truncate max-w-[200px]">{doc.source_url}</p>
+                                <p
+                                  className="text-xs text-muted-foreground truncate"
+                                  title={doc.source_url}
+                                >
+                                  {doc.source_url}
+                                </p>
                               )}
                             </div>
                           </div>
                           {doc.error_message && (
-                            <p className="text-xs text-destructive mt-0.5 truncate max-w-[200px]">{doc.error_message}</p>
+                            <p
+                              className="text-xs text-destructive mt-0.5 truncate"
+                              title={doc.error_message}
+                            >
+                              {doc.error_message}
+                            </p>
                           )}
                         </td>
                         {isAdmin && (
-                          <td className="hidden sm:table-cell p-3">
-                            <div className="flex items-center gap-1.5">
-                              <User className="w-3.5 h-3.5 text-muted-foreground" />
-                              <span className="text-xs text-muted-foreground truncate max-w-[140px]">{doc.owner_email ?? '—'}</span>
+                          <td className="hidden sm:table-cell p-3 max-w-0">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <User className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                              <span
+                                className="text-xs text-muted-foreground truncate"
+                                title={doc.owner_email ?? '—'}
+                              >
+                                {doc.owner_email ?? '—'}
+                              </span>
                             </div>
                           </td>
                         )}

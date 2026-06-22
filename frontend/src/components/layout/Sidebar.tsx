@@ -104,10 +104,10 @@ export function Sidebar() {
           variant="ghost"
           size="icon"
           onClick={handleLogout}
-          className="w-full lg:w-auto lg:px-3 justify-center lg:justify-start gap-3 text-muted-foreground hover:text-destructive"
+          className="w-full lg:w-auto lg:px-3 justify-center lg:justify-start gap-3 text-muted-foreground/60 hover:text-destructive text-xs"
         >
-          <LogOut className="w-4 h-4" />
-          <span className="hidden lg:block text-sm">Logout</span>
+          <LogOut className="w-3.5 h-3.5" />
+          <span className="hidden lg:block text-xs">Sign Out</span>
         </Button>
       </div>
     </aside>

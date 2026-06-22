@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Save, Loader2, Cpu, Database, Info, ChevronDown, LogOut, User } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Save, Loader2, Cpu, Database, Info, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { settingsService } from '@/services/settingsService'
 import { useAuthStore } from '@/store/authStore'
-import { useChatStore } from '@/store/chatStore'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import type { Settings } from '@/types'
@@ -200,19 +198,10 @@ function InfoBox({ fieldKey }: { fieldKey: string }) {
 export function SettingsPage() {
   const [form, setForm]     = useState<Partial<Settings>>({})
   const [saving, setSaving] = useState(false)
-  const { toast }           = useToast()
-  const queryClient         = useQueryClient()
-  const navigate            = useNavigate()
-  const { user, clearAuth } = useAuthStore()
-  const { resetChatStore }  = useChatStore()
-  const userId              = user?.id
-
-  const handleLogout = () => {
-    clearAuth()
-    resetChatStore()
-    queryClient.clear()
-    navigate('/login')
-  }
+  const { toast }  = useToast()
+  const queryClient = useQueryClient()
+  const { user }   = useAuthStore()
+  const userId     = user?.id
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings', userId],
@@ -402,38 +391,6 @@ export function SettingsPage() {
               <div className="flex gap-2 p-3 rounded-lg bg-amber-500/8 border border-amber-500/20 text-xs text-muted-foreground">
                 <Info className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <p>Changes to <strong className="text-foreground">Chunk Size</strong> and <strong className="text-foreground">Chunk Overlap</strong> only apply to documents uploaded <em>after</em> saving. Re-index existing documents in the Knowledge Base to apply new chunk settings.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── Account (logout — always visible, critical on mobile) ── */}
-          <Card className="border-border/50">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <User className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Account</CardTitle>
-                  <CardDescription className="text-xs">Signed in as {user?.email}</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-muted/30 border border-border/50">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold truncate">{user?.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="gap-2 text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/60 flex-shrink-0"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </Button>
               </div>
             </CardContent>
           </Card>

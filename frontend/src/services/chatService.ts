@@ -59,7 +59,7 @@ export const chatService = {
     await api.delete(`/chat/${id}`)
   },
 
-  async deleteAllConversations(): Promise<void> {
-    await api.delete('/chat/all')
+  async deleteAllConversations(ids: number[]): Promise<void> {
+    await Promise.all(ids.map((id) => api.delete(`/chat/${id}`)))
   },
 }

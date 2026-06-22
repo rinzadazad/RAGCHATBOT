@@ -48,7 +48,7 @@ export function ChatSidebar({ onNewChat, onSelectConversation, isOpen, onClose }
     }
     setClearing(true)
     try {
-      await chatService.deleteAllConversations()
+      await chatService.deleteAllConversations(conversations.map((c) => c.id))
       clearConversations()
       toast({ title: 'All chats cleared' })
     } catch {

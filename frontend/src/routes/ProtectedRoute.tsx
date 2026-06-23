@@ -8,5 +8,5 @@ export function ProtectedRoute() {
 
 export function PublicOnlyRoute() {
   const { isAuthenticated } = useAuthStore()
-  return isAuthenticated ? <Navigate to="/chat" replace /> : <Outlet />
+  return isAuthenticated ? <Navigate to="/home" replace /> : <Outlet />
 }

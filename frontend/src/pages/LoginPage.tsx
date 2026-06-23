@@ -28,7 +28,7 @@ export function LoginPage() {
       queryClient.clear()
       resetChatStore()
       setAuth(data.user, data.access_token)
-      navigate('/chat')
+      navigate('/home')
     } catch (err: any) {
       toast({
         title: 'Login failed',

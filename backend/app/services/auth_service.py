@@ -36,3 +36,14 @@ def login_user(email: str, password: str, db: Session) -> tuple[User, str]:
 
     token = create_access_token(data={"sub": str(user.id)})
     return user, token
+
+
+def reset_password(email: str, new_password: str, db: Session) -> User:
+    user = db.query(User).filter(User.email == email, User.is_active == True).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="No account found with that email")
+
+    user.password_hash = hash_password(new_password)
+    db.commit()
+    db.refresh(user)
+    return user

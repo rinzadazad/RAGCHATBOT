@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.schemas.schemas import UserCreate, UserLogin, Token, UserOut
-from app.services.auth_service import register_user, login_user
+from app.schemas.schemas import UserCreate, UserLogin, PasswordReset, Token, UserOut
+from app.services.auth_service import register_user, login_user, reset_password
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -25,3 +25,9 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 @router.post("/logout")
 def logout():
     return {"message": "Logged out successfully"}
+
+
+@router.post("/reset-password")
+def reset_password_endpoint(data: PasswordReset, db: Session = Depends(get_db)):
+    reset_password(data.email, data.new_password, db)
+    return {"message": "Password updated successfully"}

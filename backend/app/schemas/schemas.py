@@ -17,6 +17,11 @@ class UserLogin(BaseModel):
     password: str
 
 
+class PasswordReset(BaseModel):
+    email: EmailStr
+    new_password: str = Field(..., min_length=6, max_length=100)
+
+
 class UserOut(BaseModel):
     id: int
     name: str

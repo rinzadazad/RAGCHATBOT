@@ -15,4 +15,12 @@ export const authService = {
   async logout(): Promise<void> {
     await api.post('/auth/logout')
   },
+
+  async resetPassword(email: string, newPassword: string): Promise<{ message: string }> {
+    const { data } = await api.post<{ message: string }>('/auth/reset-password', {
+      email,
+      new_password: newPassword,
+    })
+    return data
+  },
 }

@@ -48,7 +48,7 @@ def _build_web_prompt(query: str, results: List[Dict[str, Any]]) -> str:
 
 def web_search_and_answer(
     query: str,
-    model: str = "llama-3.3-70b-versatile",
+    model: str = "openai/gpt-oss-120b",
     temperature: float = 0.7,
     max_tokens: int = 2048,
     top_p: float = 0.9,

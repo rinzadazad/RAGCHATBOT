@@ -35,7 +35,7 @@ export function ChatPage() {
   const { user } = useAuthStore()
   const userId = user?.id
 
-  const [selectedModel, setSelectedModel] = useState('llama-3.3-70b-versatile')
+  const [selectedModel, setSelectedModel] = useState('openai/gpt-oss-120b')
   const [loadingConversation, setLoadingConversation] = useState(false)
   const [pendingWebSearch, setPendingWebSearch] = useState<PendingWebSearch | null>(null)
   const [webSearching, setWebSearching] = useState(false)

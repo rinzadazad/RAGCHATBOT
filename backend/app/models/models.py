@@ -98,7 +98,7 @@ class Settings(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
-    model_name = Column(String(100), default="llama-3.3-70b-versatile")
+    model_name = Column(String(100), default="openai/gpt-oss-120b")
     temperature = Column(Float, default=0.7)
     max_tokens = Column(Integer, default=2048)
     top_p = Column(Float, default=0.9)

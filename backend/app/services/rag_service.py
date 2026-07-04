@@ -48,7 +48,7 @@ def process_chat(
     source_ids: Optional[List[int]] = None,
 ) -> ChatResponse:
     settings = db.query(Settings).filter(Settings.user_id == user_id).first()
-    model = model_override or (settings.model_name if settings else "llama-3.3-70b-versatile")
+    model = model_override or (settings.model_name if settings else "openai/gpt-oss-120b")
     temperature = settings.temperature if settings else 0.7
     max_tokens = settings.max_tokens if settings else 2048
     top_p = settings.top_p if settings else 0.9

@@ -4,9 +4,9 @@ from typing import AsyncGenerator, Dict, Any, Optional
 from groq import Groq, AsyncGroq
 
 SUPPORTED_MODELS = {
-    "llama-3.3-70b-versatile": {"context_window": 128000, "description": "Llama 3.3 70B - Versatile"},
+    "openai/gpt-oss-120b": {"context_window": 131072, "description": "GPT OSS 120B - Versatile"},
+    "qwen/qwen3.6-27b": {"context_window": 131072, "description": "Qwen3.6 27B - Reasoning"},
     "llama-3.1-8b-instant": {"context_window": 131072, "description": "Llama 3.1 8B - Fast"},
-    "deepseek-r1-distill-llama-70b": {"context_window": 128000, "description": "DeepSeek R1 Distill - Reasoning"},
 }
 
 _sync_client: Groq | None = None
@@ -35,7 +35,7 @@ def get_async_client() -> AsyncGroq:
 
 def chat_completion(
     prompt: str,
-    model: str = "llama-3.3-70b-versatile",
+    model: str = "openai/gpt-oss-120b",
     temperature: float = 0.7,
     max_tokens: int = 2048,
     top_p: float = 0.9,
@@ -70,7 +70,7 @@ def chat_completion(
 
 async def stream_chat_completion(
     prompt: str,
-    model: str = "llama-3.3-70b-versatile",
+    model: str = "openai/gpt-oss-120b",
     temperature: float = 0.7,
     max_tokens: int = 2048,
     top_p: float = 0.9,

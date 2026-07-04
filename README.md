@@ -186,9 +186,9 @@ RAG CHATBOT/
 
 | Model ID | Description |
 |---|---|
-| `llama-3.3-70b-versatile` | Best quality, general-purpose |
+| `openai/gpt-oss-120b` | Best quality, general-purpose |
+| `qwen/qwen3.6-27b` | Reasoning-focused |
 | `llama-3.1-8b-instant` | Fastest, lightweight |
-| `deepseek-r1-distill-llama-70b` | Reasoning-focused |
 
 ---
 

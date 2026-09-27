@@ -45,4 +45,9 @@ def run_migrations(eng=None):
             conn.execute(text("ALTER TABLE documents ADD COLUMN keyword VARCHAR(255)"))
         if "source_url" not in doc_cols:
             conn.execute(text("ALTER TABLE documents ADD COLUMN source_url VARCHAR(2048)"))
+
+        row_count = conn.execute(text("SELECT COUNT(*) FROM testconnectivity")).scalar()
+        if row_count == 0:
+            conn.execute(text("INSERT INTO testconnectivity (ischeck) VALUES (0)"))
+
         conn.commit()

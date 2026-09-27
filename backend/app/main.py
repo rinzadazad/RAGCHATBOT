@@ -15,7 +15,7 @@ load_dotenv()
 
 from app.database.database import engine, ensure_extensions, run_migrations
 from app.models.models import Base
-from app.api import auth, documents, chat, search, settings as settings_router, admin
+from app.api import auth, documents, chat, search, settings as settings_router, admin, testconnectivity
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -126,6 +126,7 @@ app.include_router(chat.router)
 app.include_router(search.router)
 app.include_router(settings_router.router)
 app.include_router(admin.router)
+app.include_router(testconnectivity.router)
 
 
 @app.get("/health")

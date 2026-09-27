@@ -111,6 +111,13 @@ class Settings(Base):
     user = relationship("User", back_populates="settings")
 
 
+class TestConnectivity(Base):
+    __tablename__ = "testconnectivity"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ischeck = Column(Integer, default=0)
+
+
 class DocumentChunk(Base):
     __tablename__ = "document_chunks"
 

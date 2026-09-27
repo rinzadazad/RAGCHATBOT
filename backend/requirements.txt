@@ -11,6 +11,7 @@ python-multipart>=0.0.9
 groq>=0.11.0
 pgvector>=0.3.0
 psycopg2-binary>=2.9.0
+psycopg[binary]>=3.1.0
 supabase>=2.0.0
 fastembed>=0.3.0
 PyPDF2>=3.0.1
